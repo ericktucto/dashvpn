@@ -1,0 +1,29 @@
+{
+    "name": "erick/dashvpn",
+    "description": "Dashboard lightweight to Wireguard",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Erick Tucto",
+            "email": "erick@ericktucto.com"
+        }
+    ],
+    "scripts": {
+        "server": [
+            "echo http://localhost:8686",
+            "Composer\\Config::disableProcessTimeout",
+            "@php -S 0.0.0.0:8686 -t public"
+        ]
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.1",
+        "ericktucto/touch": "^1.0.0-alpha"
+    }
+}
