@@ -476,3 +476,5 @@ composer.lock
 *.scss.map
 /clockwork/
 /config.yml
+/app.db
+/.phpunit.cache/

@@ -1,6 +1,14 @@
 env: local
 definitions:
   - ./config/definitions.php
+databases:
+  default: sqlite
+  sqlite:
+    driver: sqlite
+    path: ../app.db
+jwt:
+  key: example
+  expires: 3600
 data:
   ip: 127.0.0.1
   dns: 1.1.1.1
