@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Domain\Wireguard\Server;
+
 interface WireguardWrapperInterface
 {
     /**
@@ -20,4 +22,11 @@ interface WireguardWrapperInterface
     public function getPeers(): array|false;
 
     public function getPsk(): string|false;
+
+    /**
+     * @return array<string, array<string, string>>|false
+     */
+    public function generateKeys(): array|false;
+
+    public function createServer(Server $server): bool;
 }

@@ -13,5 +13,6 @@ class WireguardRoutes extends Route
     {
         $group->get('/peers', [PeerController::class, 'index']);
         $group->get('/server', [ServerController::class, 'index']);
+        $group->post('/server', [ServerController::class, 'create']);
     }
 }
