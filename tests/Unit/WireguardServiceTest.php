@@ -2,6 +2,8 @@
 
 namespace App\Tests\Unit;
 
+use App\Adapters\Wireguard\FileToPeer;
+use App\Adapters\Wireguard\FileToServer;
 use App\Services\WireguardService;
 use App\Services\WireguardWrapperInterface;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +16,8 @@ class WireguardServiceTest extends TestCase
         $lines = explode("\n", file_get_contents('./tests/Unit/Fixtures/wg0.conf'));
 
         $config = new class {
-            public function get(string $key) {
+            public function get(string $key)
+            {
                 if ($key === 'data') {
                     return [
                         'ip' => '127.0.0.1',
@@ -41,7 +44,11 @@ class WireguardServiceTest extends TestCase
                 'presharedKey' => 'jDreKQlSPG3MBSHG',
             ]);
 
-        $service = new WireguardService($container, $mock);
+        $service = new WireguardService(
+            new FileToServer($container),
+            new FileToPeer(),
+            $mock,
+        );
 
         $server = $service->server();
 

@@ -8,11 +8,11 @@ class Peer implements KeyAwareInterface, VPNAddressInterface
     use VPNAddressTrait;
 
     public function __construct(
-        private string $name,
-        private string $address,
-        private string $publicKey,
-        private string $privateKey,
-        private string $preSharedKey = '',
+        protected string $name,
+        protected string $address,
+        protected string $publicKey,
+        protected string $privateKey,
+        protected string $preSharedKey = '',
     ) {
     }
 

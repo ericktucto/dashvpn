@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+/**
+ * @todo add implementation to production environment
+ */
 class WireguardWrapper implements WireguardWrapperInterface
 {
     /**

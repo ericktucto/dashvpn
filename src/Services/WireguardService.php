@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
+use App\Adapters\Wireguard\FileToPeer;
+use App\Adapters\Wireguard\FileToServer;
 use App\Domain\Wireguard\Server;
-use App\Helper;
 use Exception;
-use Psr\Container\ContainerInterface;
 
 class WireguardService implements WireguardServiceInterface
 {
     public function __construct(
-        protected ContainerInterface $container,
+        protected FileToServer $adapterServer,
+        protected FileToPeer $adapterPeer,
         protected WireguardWrapperInterface $wrapper,
     ) {
     }
@@ -27,39 +28,15 @@ class WireguardService implements WireguardServiceInterface
             throw new Exception('No initizated server config');
         }
 
-        $address = '';
-        $listenPort = '';
-        foreach ($server as $line) {
-            $property = Helper::getProperty($line, 'Address');
-            if ($property) {
-                $address = $property;
-            }
-
-            $property = Helper::getProperty($line, 'ListenPort');
-            if ($property) {
-                $listenPort = $property;
-            }
-            if (str_contains($line, '[Peer]')) {
-                break;
-            }
-        }
-
-        $server = new Server(
-            $address,
-            $this->container->get('config')->get('data')['ip'],
-            $listenPort,
-            $this->container->get('config')->get('data')['dns'],
-        );
-        $server->setKeys(
-            $keys['publicKey'],
-            $keys['privateKey'],
-            $keys['presharedKey'],
-        );
-        return $server;
+        return $this->adapterServer->parse($keys, $server);
     }
 
     public function peers(): array
     {
-        return [];
+        $peers = $this->wrapper->getPeers();
+        return array_map(
+            fn ($peer) => $this->adapterPeer->parse($peer['keys'], $peer['data']),
+            $peers
+        );
     }
 }

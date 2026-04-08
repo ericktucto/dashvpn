@@ -36,7 +36,7 @@ class Server implements KeyAwareInterface, VPNAddressInterface
     public function toArray(): array
     {
         return [
-            'address' => $this->address . '/24',
+            'address' => $this->address,
             'ip' => $this->ip,
             'port' => $this->listenPort,
             'dns' => $this->dns,
