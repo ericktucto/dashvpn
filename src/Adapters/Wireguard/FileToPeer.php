@@ -20,7 +20,7 @@ class FileToPeer
         foreach ($lines as $line) {
             $property = Helper::getProperty($line, 'Address');
             if ($property) {
-                $address = $property;
+                $address = preg_replace('/\/32/', '', $property);
             }
         }
 

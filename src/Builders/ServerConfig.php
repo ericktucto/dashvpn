@@ -18,17 +18,18 @@ class ServerConfig implements ConfigInterface
     public function generate(): array
     {
         $lines = [];
-        $lines[] = "[Interface]";
-        $lines[] = "Address = {$this->server->getAddress()}/24";
-        $lines[] = "ListenPort = {$this->server->getListenPort()}";
-        $lines[] = "PrivateKey = {$this->server->getPrivateKey()}";
+        $lines[] = "[Interface]\n";
+        $lines[] = "Address = {$this->server->getAddress()}/24\n";
+        $lines[] = "ListenPort = {$this->server->getListenPort()}\n";
+        $lines[] = "PrivateKey = {$this->server->getPrivateKey()}\n";
         foreach ($this->peers as $peer) {
-            $lines[] = "# {$peer->getName()}";
-            $lines[] = "[Peer]";
-            $lines[] = "PublicKey = {$peer->getPublicKey()}";
-            $lines[] = "PresharedKey = {$peer->getPresharedKey()}";
-            $lines[] = "AllowedIPs = {$peer->getAddress()}/32";
-            $lines[] = "PersistentKeepalive = 25";
+            $lines[] = "# {$peer->getName()}\n";
+            $lines[] = "[Peer]\n";
+            $lines[] = "PublicKey = {$peer->getPublicKey()}\n";
+            $lines[] = "PresharedKey = {$peer->getPresharedKey()}\n";
+            $lines[] = "AllowedIPs = {$peer->getAddress()}/32\n";
+            $lines[] = "PersistentKeepalive = 25\n";
         }
+        return $lines;
     }
 }

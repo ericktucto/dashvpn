@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Domain\Wireguard\Config;
 use App\Domain\Wireguard\Server;
 
 interface WireguardServiceInterface

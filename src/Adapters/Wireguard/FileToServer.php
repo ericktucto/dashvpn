@@ -26,7 +26,7 @@ class FileToServer
         foreach ($lines as $line) {
             $property = Helper::getProperty($line, 'Address');
             if ($property) {
-                $address = $property;
+                $address = preg_replace('/\/24/', '', $property);
             }
 
             $property = Helper::getProperty($line, 'ListenPort');

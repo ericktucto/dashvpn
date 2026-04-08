@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Adapters\Wireguard\FileToPeer;
 use App\Adapters\Wireguard\FileToServer;
 use App\Domain\Wireguard\Ip;
+use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use Exception;
+use Illuminate\Support\Str;
 
 class WireguardService implements WireguardServiceInterface
 {
@@ -47,7 +49,7 @@ class WireguardService implements WireguardServiceInterface
         int $listenPort,
         Ip|null $dns,
     ): Server {
-        $keys = $this->wrapper->generateKeys();
+        $keys = $this->wrapper->generateKeys('wg0');
 
         $server = new Server(
             $address->getValue(),
@@ -67,5 +69,31 @@ class WireguardService implements WireguardServiceInterface
         }
 
         return $server;
+    }
+
+    public function addPeer(
+        string $name,
+    ): Peer {
+        // check exists peers directory
+        $this->wrapper->generatePeersDirectory();
+
+        $slug = Str::slug($name);
+
+        $keys = $this->wrapper->generateKeys(
+            "peers/{$slug}"
+        );
+        $peer = new Peer(
+            $name,
+            $this->wrapper->nextAddress()->getValue(),
+            $keys['publicKey'],
+            $keys['privateKey'],
+            $keys['presharedKey'],
+        );
+
+        if (!$this->wrapper->addPeer($this->server(), $peer)) {
+            throw new Exception('Cant create peer');
+        }
+
+        return $peer;
     }
 }

@@ -12,6 +12,7 @@ class WireguardRoutes extends Route
     protected function routes(RouteGroup $group): void
     {
         $group->get('/peers', [PeerController::class, 'index']);
+        $group->post('/peers', [PeerController::class, 'create']);
         $group->get('/server', [ServerController::class, 'index']);
         $group->post('/server', [ServerController::class, 'create']);
     }

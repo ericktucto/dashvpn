@@ -16,19 +16,19 @@ class PeerConfig implements ConfigInterface
     public function generate(): array
     {
         $lines = [];
-        $lines[] = "# {$this->peer->getName()}";
+        $lines[] = "# {$this->peer->getName()}\n";
         $lines[] = '[Interface]';
-        $lines[] = "PrivateKey = {$this->server->getPrivateKey()}";
-        $lines[] = "Address = {$this->peer->getAddress()}/32";
+        $lines[] = "PrivateKey = {$this->server->getPrivateKey()}\n";
+        $lines[] = "Address = {$this->peer->getAddress()}/32\n";
         if ($this->server->getDns()) {
-            $lines[] = "DNS = {$this->server->getDns()}";
+            $lines[] = "DNS = {$this->server->getDns()}\n";
         }
         $lines[] = '[Peer]';
-        $lines[] = "PublicKey = {$this->peer->getPublicKey()}";
-        $lines[] = "PresharedKey = {$this->peer->getPresharedKey()}";
-        $lines[] = "Endpoint = {$this->server->getIp()}";
-        $lines[] = "AllowedIPs = 0.0.0.0/0, ::/0";
-        $lines[] = "PersistentKeepalive = 25";
+        $lines[] = "PublicKey = {$this->peer->getPublicKey()}\n";
+        $lines[] = "PresharedKey = {$this->peer->getPresharedKey()}\n";
+        $lines[] = "Endpoint = {$this->server->getIp()}\n";
+        $lines[] = "AllowedIPs = 0.0.0.0/0, ::/0\n";
+        $lines[] = "PersistentKeepalive = 25\n";
         return $lines;
     }
 }
