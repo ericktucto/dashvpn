@@ -7,11 +7,15 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\ConnectionResolverInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
 use Touch\Http\Response;
 
 class AuthController
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
         protected ContainerInterface $container,
         protected ConnectionResolverInterface $resolver,
@@ -19,16 +23,19 @@ class AuthController
         User::setConnectionResolver($this->resolver);
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function login(
         Request $request
-    ) {
+    ): ResponseInterface {
         try {
             $data = $request->getBody()->getContents();
             $json = json_decode($data);
 
             // validation
             /** @var User|null $user */
-            $user = User::where('username', $json->username)->first();
+            $user = User::query()->where('username', $json->username)->first();
             if (
                 !$user || !$user->isPassword($json->password)
             ) {
@@ -59,7 +66,10 @@ class AuthController
         }
     }
 
-    public function register(Request $request)
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function register(Request $request): ResponseInterface
     {
         $data = $request->getBody()->getContents();
         $json = json_decode($data);
@@ -80,7 +90,10 @@ class AuthController
         }
     }
 
-    public function changePassword(Request $request)
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function changePassword(Request $request): ResponseInterface
     {
         $data = $request->getBody()->getContents();
         $json = json_decode($data);
@@ -96,7 +109,7 @@ class AuthController
         $decoded = JWT::decode($token, new Key($key, 'HS256'));
 
         /** @var User|null $user */
-        $user = User::where('username', $decoded->user->username)->first();
+        $user = User::query()->where('username', $decoded->user->username)->first();
         if (!$user) {
             return Response::json([
                 'message' => 'Password not match',

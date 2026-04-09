@@ -4,8 +4,9 @@ namespace App\Builders;
 
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
+use Override;
 
-class PeerConfig implements ConfigInterface
+final class PeerConfig implements ConfigInterface
 {
     public function __construct(
         protected Server $server,
@@ -13,6 +14,10 @@ class PeerConfig implements ConfigInterface
     ) {
     }
 
+    #[Override]
+    /**
+     * @return list<string>
+     */
     public function generate(): array
     {
         $lines = [];

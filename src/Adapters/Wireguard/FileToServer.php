@@ -8,6 +8,9 @@ use Psr\Container\ContainerInterface;
 
 class FileToServer
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
         protected ContainerInterface $container,
     ) {

@@ -10,11 +10,17 @@ use Touch\Http\Response;
 
 class ServerController
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
         protected WireguardService $service,
     ) {
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function index(): ResponseInterface
     {
         return Response::json([
@@ -22,6 +28,9 @@ class ServerController
         ]);
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function store(
         Request $request
     ): ResponseInterface {

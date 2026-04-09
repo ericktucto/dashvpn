@@ -2,17 +2,18 @@
 
 namespace App\Services;
 
-use App\Adapters\Wireguard\FileToServer;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use Exception;
 use Override;
 
-class WireguardService implements WireguardServiceInterface
+final class WireguardService implements WireguardServiceInterface
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
-        protected FileToServer $adapterServer,
         protected WireguardWrapperInterface $wrapper,
     ) {
     }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Builders\ServerConfig;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Server;
+use App\Helper;
 use Exception;
 
 trait HasServerLocalManage
@@ -21,6 +22,33 @@ trait HasServerLocalManage
         }
         return $this->adapterServer->parse($keys, $output);
     }
+
+    protected function getServerKeys(): array|false
+    {
+        $keys = [
+            'publicKey' => '',
+            'privateKey' => '',
+            'presharedKey' => '',
+        ];
+        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
+        if ($keys['publicKey'] === false) {
+            return false;
+        }
+
+        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
+        if ($keys['privateKey'] === false) {
+            return false;
+        }
+
+        $psk = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
+        if ($psk === false) {
+            return false;
+        }
+        $keys['presharedKey'] = $psk;
+
+        return $keys;
+    }
+
 
     public function nextAllowAddress(): Ip
     {

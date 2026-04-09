@@ -10,28 +10,17 @@ interface WireguardWrapperInterface
 {
     public function getServer(): ?Server;
 
-    /**
-     * @return array{
-     *  publicKey: string,
-     *  privateKey: string,
-     *  presharedKey: string
-     * }|false
-     */
-    public function getServerKeys(): array|false;
-
-    /**
-     * @return list<Peer>|false
-     */
-    public function getPeers(): array|false;
-
-    public function getPsk(): string|false;
-
     public function createServer(
         Ip $ip,
         Ip $address,
         int $listenPort,
         Ip|null $dns,
     ): Server;
+
+    /**
+     * @return list<Peer>|false
+     */
+    public function getPeers(): array|false;
 
     public function createPeer(string $name): ?Peer;
 

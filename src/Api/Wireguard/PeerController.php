@@ -12,12 +12,18 @@ use Touch\Http\Response;
 
 class PeerController
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
         protected WireguardService $service,
         protected WireguardWrapperInterface $wrapper,
     ) {
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function index(): ResponseInterface
     {
         $peers = $this->service->peers();
@@ -28,10 +34,7 @@ class PeerController
 
     protected function isPeerNameExists(string $slug): bool
     {
-        $peers = $this->wrapper->getPeers();
-        if ($peers === false) {
-            return false;
-        }
+        $peers = $this->service->peers();
         foreach ($peers as $peer) {
             if ($peer->getSlug() === $slug) {
                 return true;
@@ -40,6 +43,9 @@ class PeerController
         return false;
     }
 
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function store(
         Request $request
     ): ResponseInterface {
@@ -60,6 +66,7 @@ class PeerController
     }
 
     /**
+     * @psalm-suppress PossiblyUnusedMethod
      * @param array{slug: string} $args
      */
     public function update(
@@ -81,10 +88,11 @@ class PeerController
     }
 
     /**
+     * @psalm-suppress PossiblyUnusedMethod
      * @param array{slug: string} $args
      */
     public function destroy(
-        Request $request,
+        Request $_request,
         array $args,
     ): ResponseInterface {
         $this->wrapper->deletePeer($args['slug']);

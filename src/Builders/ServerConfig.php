@@ -3,8 +3,9 @@
 namespace App\Builders;
 
 use App\Domain\Wireguard\Server;
+use Override;
 
-class ServerConfig implements ConfigInterface
+final class ServerConfig implements ConfigInterface
 {
     public function __construct(
         protected Server $server,
@@ -15,6 +16,10 @@ class ServerConfig implements ConfigInterface
     ) {
     }
 
+    #[Override]
+    /**
+     * @return list<string>
+     */
     public function generate(): array
     {
         $lines = [];

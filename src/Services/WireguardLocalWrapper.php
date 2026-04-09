@@ -14,43 +14,15 @@ use Exception;
 use Illuminate\Support\Str;
 use Override;
 
-class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInterface, ServerManageInterface
+final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInterface, ServerManageInterface
 {
     use HasPeerLocalManage;
     use HasServerLocalManage;
 
     public function __construct(
         protected FileToServer $adapterServer,
-        protected FileToPeer $adapterPeer,
         protected string $prefix,
     ) {
-    }
-
-    #[Override]
-    public function getServerKeys(): array|false
-    {
-        $keys = [
-            'publicKey' => '',
-            'privateKey' => '',
-            'presharedKey' => '',
-        ];
-        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
-        if ($keys['publicKey'] === false) {
-            return false;
-        }
-
-        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
-        if ($keys['privateKey'] === false) {
-            return false;
-        }
-
-        $psk = $this->getPsk();
-        if ($psk === false) {
-            return false;
-        }
-        $keys['presharedKey'] = $psk;
-
-        return $keys;
     }
 
     #[Override]
@@ -64,7 +36,7 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
             return false;
         }
 
-        $psk = $this->getPsk();
+        $psk = $this->getServer()?->getPresharedKey() ?? false;
         if ($psk === false) {
             return false;
         }
@@ -92,12 +64,6 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
         }
 
         return $peers;
-    }
-
-    #[Override]
-    public function getPsk(): string|false
-    {
-        return Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
     }
 
     public function generateKeys(
@@ -240,11 +206,6 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
     protected function generatePeersDirectory(): void
     {
         @mkdir("{$this->prefix}/wireguard/peers");
-    }
-
-    public function isPeerNameExists(string $slug): bool
-    {
-        return file_exists("{$this->prefix}/wireguard/peers/{$slug}.conf");
     }
 
     #[Override]

@@ -18,14 +18,5 @@ interface PeerManageInterface
      */
     public function generateKeysPeers(string $target): array|false;
 
-    /**
-     * @return array{
-     *  publicKey: string,
-     *  privateKey: string,
-     *  presharedKey: string
-     * }|false
-     */
-    public function getKeysPeers(string $target): array|false;
-
     public function setPeerFile(Peer $peer, Server $server): void;
 }

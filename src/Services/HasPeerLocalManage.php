@@ -51,37 +51,6 @@ trait HasPeerLocalManage
         ];
     }
 
-    /**
-     * @return array{
-     *  publicKey: string,
-     *  privateKey: string,
-     *  presharedKey: string
-     * }|false
-     */
-    public function getKeysPeers(string $target): array|false
-    {
-        $pub = Helper::outputFirstLine("cat {$this->prefix}/wireguard/peers/{$target}.pub");
-        if ($pub === false) {
-            return false;
-        }
-
-        $key = Helper::outputFirstLine("cat {$this->prefix}/wireguard/peers/{$target}.key");
-        if ($key === false) {
-            return false;
-        }
-
-        $psk = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
-        if ($psk === false) {
-            return false;
-        }
-
-        return [
-            "publicKey" => $pub,
-            "privateKey" => $key,
-            "presharedKey" => $psk,
-        ];
-    }
-
     public function setPeerFile(Peer $peer, Server $server): void
     {
         $builder = new PeerConfig($server, $peer);

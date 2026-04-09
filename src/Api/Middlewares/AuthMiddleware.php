@@ -37,7 +37,7 @@ class AuthMiddleware implements MiddlewareInterface
         $key = $this->container->get('config')->get('jwt.key');
 
         try {
-            $decoded = JWT::decode($token, new Key($key, 'HS256'));
+            JWT::decode($token, new Key($key, 'HS256'));
         } catch (\Exception $e) {
             return Response::json(['message' => 'Unauthorized'], 401);
         }
