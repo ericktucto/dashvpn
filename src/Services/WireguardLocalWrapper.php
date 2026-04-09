@@ -163,6 +163,12 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
         return $server;
     }
 
+    protected function setKeys(string $slug, string $pub, string $prv): void
+    {
+        file_put_contents("{$this->prefix}/wireguard/peers/{$slug}.pub", $pub);
+        file_put_contents("{$this->prefix}/wireguard/peers/{$slug}.key", $prv);
+    }
+
     #[Override]
     public function updatePeer(
         string $slug,
@@ -189,6 +195,11 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
         }
         if (!$target) {
             throw new Exception('Peer not found');
+        }
+
+        if ($target->getSlug() !== Str::slug($name)) {
+            $this->setKeys(Str::slug($name), $target->getPublicKey(), $target->getPrivateKey());
+            $this->removeFileOfPeer($target);
         }
 
         $peer = new Peer(

@@ -478,3 +478,4 @@ composer.lock
 /config.yml
 /app.db
 /.phpunit.cache/
+/wireguard/
