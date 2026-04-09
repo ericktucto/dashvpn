@@ -8,7 +8,7 @@ use League\Route\RouteGroup;
 use Override;
 use Touch\Http\Route;
 
-class WireguardRoutes extends Route
+final class WireguardRoutes extends Route
 {
     #[Override]
     protected function routes(RouteGroup $group): void

@@ -5,7 +5,7 @@ namespace App\Adapters\Wireguard;
 use App\Domain\Wireguard\Peer;
 use App\Helper;
 
-class FileToPeer
+final class FileToPeer
 {
     /**
      * @param array{
@@ -23,8 +23,8 @@ class FileToPeer
         $address = '';
         foreach ($lines as $line) {
             $property = Helper::getProperty($line, 'Address');
-            if ($property) {
-                $address = preg_replace('/\/32/', '', $property);
+            if ($property !== null) {
+                $address = preg_replace('/\/32/', '', $property) ?? '';
             }
         }
 

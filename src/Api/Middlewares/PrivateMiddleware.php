@@ -2,8 +2,6 @@
 
 namespace App\Api\Middlewares;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Override;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,7 +10,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Touch\Http\Response;
 
-class PrivateMiddleware implements MiddlewareInterface
+final class PrivateMiddleware implements MiddlewareInterface
 {
     public function __construct(
         protected ContainerInterface $container,

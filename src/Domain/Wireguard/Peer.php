@@ -4,7 +4,7 @@ namespace App\Domain\Wireguard;
 
 use Illuminate\Support\Str;
 
-class Peer implements KeyAwareInterface, VPNAddressInterface
+final class Peer implements KeyAwareInterface, VPNAddressInterface
 {
     use KeyAwareTrait;
     use VPNAddressTrait;

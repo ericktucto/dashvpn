@@ -6,7 +6,7 @@ use App\Domain\Wireguard\Server;
 use App\Helper;
 use Psr\Container\ContainerInterface;
 
-class FileToServer
+final class FileToServer
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod
@@ -25,16 +25,16 @@ class FileToServer
         array $lines,
     ): Server {
         $address = '';
-        $listenPort = '';
+        $listenPort = 0;
         foreach ($lines as $line) {
             $property = Helper::getProperty($line, 'Address');
-            if ($property) {
-                $address = preg_replace('/\/24/', '', $property);
+            if ($property !== null) {
+                $address = preg_replace('/\/24/', '', $property) ?? '';
             }
 
             $property = Helper::getProperty($line, 'ListenPort');
-            if ($property) {
-                $listenPort = $property;
+            if ($property !== null) {
+                $listenPort = (int) $property;
             }
             if (str_contains($line, '[Peer]')) {
                 break;

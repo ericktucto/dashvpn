@@ -19,10 +19,6 @@ final class Helper
     {
         $output = [];
         exec($command, $output);
-        /** @var list<string>|false $output */
-        if ($output === false || count($output) === 0) {
-            return false;
-        }
-        return $output[0];
+        return count($output) === 0 ? false : $output[0];
     }
 }

@@ -2,22 +2,17 @@
 
 namespace App\Tests\Unit;
 
-use App\Adapters\Wireguard\FileToPeer;
-use App\Adapters\Wireguard\FileToServer;
 use App\Domain\Wireguard\Server;
 use App\Services\WireguardService;
 use App\Services\WireguardWrapperInterface;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use Psr\Container\ContainerInterface;
 
 class WireguardServiceTest extends TestCase
 {
     #[AllowMockObjectsWithoutExpectations]
     public function test_can_get_server(): void
     {
-        $container = $this->createMock(ContainerInterface::class);
-
         $serverMock = new Server(
             '10.8.0.1',
             '127.0.0.1',
@@ -32,7 +27,6 @@ class WireguardServiceTest extends TestCase
             ->willReturn($serverMock);
 
         $service = new WireguardService(
-            new FileToServer($container),
             $mock,
         );
 

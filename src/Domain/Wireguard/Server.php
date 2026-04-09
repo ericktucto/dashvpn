@@ -2,7 +2,7 @@
 
 namespace App\Domain\Wireguard;
 
-class Server implements KeyAwareInterface, VPNAddressInterface
+final class Server implements KeyAwareInterface, VPNAddressInterface
 {
     use KeyAwareTrait;
     use VPNAddressTrait;
@@ -13,6 +13,7 @@ class Server implements KeyAwareInterface, VPNAddressInterface
         protected int $listenPort = 51820,
         protected string $dns = '',
     ) {
+        $this->setKeys('', '');
     }
 
     public function getIp(): string

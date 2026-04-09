@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $password
  * @property string $username
  */
-class User extends Model
+final class User extends Model
 {
     public $table = 'users';
     public $dateFormat = 'Y-m-d H:i:s';

@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
 use Touch\Http\Response;
 
-class PeerController
+final class PeerController
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod

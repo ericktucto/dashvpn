@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
 use Touch\Http\Response;
 
-class AuthController
+final class AuthController
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod

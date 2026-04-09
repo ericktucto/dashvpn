@@ -2,7 +2,7 @@
 
 namespace App\Domain\Wireguard;
 
-class Ip
+final class Ip
 {
     public function __construct(
         private string $ip,

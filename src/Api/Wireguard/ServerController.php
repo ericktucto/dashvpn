@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
 use Touch\Http\Response;
 
-class ServerController
+final class ServerController
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod

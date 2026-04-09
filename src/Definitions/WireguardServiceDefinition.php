@@ -8,7 +8,7 @@ use App\Services\WireguardLocalWrapper;
 use App\Services\WireguardWrapperInterface;
 use Psr\Container\ContainerInterface;
 
-class WireguardServiceDefinition
+final class WireguardServiceDefinition
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod
