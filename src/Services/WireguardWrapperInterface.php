@@ -8,35 +8,36 @@ use App\Domain\Wireguard\Server;
 
 interface WireguardWrapperInterface
 {
-    /**
-     * @return string[]|false
-     */
-    public function getServer(): array|false;
+    public function getServer(): ?Server;
 
     /**
-     * @return string[]|false
+     * @return array{
+     *  publicKey: string,
+     *  privateKey: string,
+     *  presharedKey: string
+     * }|false
      */
     public function getServerKeys(): array|false;
 
     /**
-     * @return array<string, array<string, string>>|false
+     * @return Peer[]|false
      */
     public function getPeers(): array|false;
 
     public function getPsk(): string|false;
 
-    /**
-     * @return array<string, array<string, string>>|false
-     */
-    public function generateKeys(string $target): array|false;
+    public function createServer(
+        Ip $ip,
+        Ip $address,
+        int $listenPort,
+        Ip|null $dns,
+    ): Server;
 
-    public function createServer(Server $server): bool;
+    public function createPeer(string $name): ?Peer;
 
-    public function generatePeersDirectory(): void;
+    public function updatePeer(string $slug, string $name, Ip $address): Peer;
 
-    public function addPeer(Server $server, Peer $peer): bool;
+    public function deletePeer(string $slug): void;
 
     public function nextAddress(): Ip;
-
-    public function isPeerNameExists(string $slug): bool;
 }

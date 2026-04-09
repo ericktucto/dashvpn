@@ -55,7 +55,6 @@ class AuthController
                 'data' => $token,
             ]);
         } catch (\Throwable $e) {
-            dd($e);
             return Response::json(['message' => 'Invalid credentials'], 401);
         }
     }

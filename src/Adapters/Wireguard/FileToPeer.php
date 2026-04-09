@@ -8,7 +8,11 @@ use App\Helper;
 class FileToPeer
 {
     /**
-     * @param string[] $keys
+     * @param array{
+     *  publicKey: string,
+     *  privateKey: string,
+     *  presharedKey: string
+     * } $keys
      * @param string[] $lines
      */
     public function parse(

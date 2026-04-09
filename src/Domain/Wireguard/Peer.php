@@ -2,6 +2,8 @@
 
 namespace App\Domain\Wireguard;
 
+use Illuminate\Support\Str;
+
 class Peer implements KeyAwareInterface, VPNAddressInterface
 {
     use KeyAwareTrait;
@@ -21,6 +23,11 @@ class Peer implements KeyAwareInterface, VPNAddressInterface
         return $this->name;
     }
 
+    public function getSlug(): string
+    {
+        return Str::slug($this->name);
+    }
+
     /**
      * @return mixed[]
      */
@@ -30,6 +37,7 @@ class Peer implements KeyAwareInterface, VPNAddressInterface
             'name' => $this->name,
             'address' => $this->address,
             'publicKey' => $this->publicKey,
+            'slug' => $this->getSlug(),
         ];
     }
 }

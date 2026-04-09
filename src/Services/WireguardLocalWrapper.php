@@ -3,29 +3,44 @@
 namespace App\Services;
 
 use App\Adapters\Wireguard\FileToPeer;
+use App\Adapters\Wireguard\FileToServer;
 use App\Builders\PeerConfig;
 use App\Builders\ServerConfig;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
+use App\Helper;
+use Exception;
 use Illuminate\Support\Str;
+use Override;
 
-class WireguardLocalWrapper implements WireguardWrapperInterface
+class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInterface, ServerManageInterface
 {
+    use HasPeerLocalManage;
+    use HasServerLocalManage;
+
     public function __construct(
+        protected FileToServer $adapterServer,
+        protected FileToPeer $adapterPeer,
         protected string $prefix,
     ) {
     }
 
-    public function getServer(): array|false
+    #[Override]
+    public function getServer(): ?Server
     {
-        $result = exec("cat {$this->prefix}/wireguard/wg0.conf", $output);
+        $result = (bool) exec("cat {$this->prefix}/wireguard/wg0.conf", $output);
         if (!$result) {
-            return false;
+            return null;
         }
-        return $output;
+        $keys = $this->getServerKeys();
+        if (!$keys) {
+            throw new Exception('No keys');
+        }
+        return $this->adapterServer->parse($keys, $output);
     }
 
+    #[Override]
     public function getServerKeys(): array|false
     {
         $keys = [
@@ -33,18 +48,18 @@ class WireguardLocalWrapper implements WireguardWrapperInterface
             'privateKey' => '',
             'presharedKey' => '',
         ];
-        $keys['publicKey'] = $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
-        if (!$keys['publicKey']) {
+        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
+        if ($keys['publicKey'] === false) {
             return false;
         }
 
-        $keys['privateKey'] = $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
-        if (!$keys['privateKey']) {
+        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
+        if ($keys['privateKey'] === false) {
             return false;
         }
 
         $psk = $this->getPsk();
-        if (!$psk) {
+        if ($psk === false) {
             return false;
         }
         $keys['presharedKey'] = $psk;
@@ -52,20 +67,26 @@ class WireguardLocalWrapper implements WireguardWrapperInterface
         return $keys;
     }
 
+    #[Override]
+    /**
+     * @return Peer[]|false
+     */
     public function getPeers(): array|false
     {
-        $result = exec("ls {$this->prefix}/wireguard/peers/*.conf", $output);
-        if (!$result) {
+        $result = (bool) exec("ls {$this->prefix}/wireguard/peers/*.conf", $output);
+        if (!$result || !$output) {
             return false;
         }
 
         $psk = $this->getPsk();
-        if (!$psk) {
+        if ($psk === false) {
             return false;
         }
 
         $peers = [];
 
+        $adapter = new FileToPeer();
+        /** @var string[] $output */
         foreach ($output as $peer) {
             $data = null;
             exec("cat $peer", $data);
@@ -76,42 +97,34 @@ class WireguardLocalWrapper implements WireguardWrapperInterface
             ];
 
             $pub = preg_replace('/.conf$/', '.pub', $peer);
-            $keys['publicKey'] = $this->outputFirstLine("cat $pub");
+            $keys['publicKey'] = (string) Helper::outputFirstLine("cat $pub");
 
             $prv = preg_replace('/.conf$/', '.key', $peer);
-            $keys['privateKey'] = $this->outputFirstLine("cat $prv");
+            $keys['privateKey'] = (string) Helper::outputFirstLine("cat $prv");
 
-            $peers[] = compact('data', 'keys');
+            $peers[] = $adapter->parse($keys, $data);
         }
 
         return $peers;
     }
 
+    #[Override]
     public function getPsk(): string|false
     {
-        return $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
-    }
-
-    protected function outputFirstLine(string $command): string|false
-    {
-        $result = exec($command, $output);
-        if (!$result) {
-            return false;
-        }
-        return $output[0];
+        return Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
     }
 
     public function generateKeys(
         string $target,
     ): array|false {
-        $this->outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.pub");
-        $pub = $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
+        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.pub");
+        $pub = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
 
-        $this->outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.key");
-        $key = $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
+        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.key");
+        $key = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
 
-        $this->outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.psk");
-        $psk = $this->outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
+        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/{$target}.psk");
+        $psk = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
 
         return [
             "publicKey" => $pub,
@@ -120,68 +133,194 @@ class WireguardLocalWrapper implements WireguardWrapperInterface
         ];
     }
 
-    public function createServer(Server $server): bool
-    {
-        $builder = new ServerConfig($server, []);
-        $lines = $builder->generate();
-
-        file_put_contents("{$this->prefix}/wireguard/wg0.conf", $lines);
-
-        return true;
-    }
-
-    public function addPeer(Server $server, Peer $peer): bool
-    {
-        $builder = new PeerConfig($server, $peer);
-        $lines = $builder->generate();
-
-        $slug = Str::slug($peer->getName());
-
-        file_put_contents("{$this->prefix}/wireguard/peers/{$slug}.conf", $lines);
-
-        exec("ls {$this->prefix}/wireguard/peers/*.conf", $files);
-        $adapter = new FileToPeer();
-        $peers = array_map(
-            fn ($peer) => $adapter->parse($peer['keys'], $peer['data']),
-            $this->getPeers(),
+    #[Override]
+    public function createServer(
+        Ip $ip,
+        Ip $address,
+        int $listenPort,
+        Ip|null $dns,
+    ): Server {
+        $server = new Server(
+            $address->getValue(),
+            $ip->getValue(),
+            $listenPort,
+            $dns?->getValue() ?? '',
         );
 
-        $builder = new ServerConfig($server, $peers);
-        $lines = $builder->generate();
+        $keys = $this->generateKeys('wg0');
+        if ($keys === false) {
+            throw new Exception('Cant generate keys');
+        }
 
-        file_put_contents("{$this->prefix}/wireguard/wg0.conf", $lines);
+        $server->setKeys(
+            $keys['publicKey'],
+            $keys['privateKey'],
+            $keys['presharedKey'],
+        );
 
-        return true;
+        $this->reloadFileConfig($server, []);
+
+        return $server;
     }
 
-    public function generatePeersDirectory(): void
+    #[Override]
+    public function updatePeer(
+        string $slug,
+        string $name,
+        Ip $address,
+    ): Peer {
+        $server = $this->getServer();
+        if ($server === null) {
+            throw new Exception('Server not found');
+        }
+
+        $peers = $this->getPeers();
+        if ($peers === false) {
+            throw new Exception('Cant get peers');
+        }
+        $target = null;
+        $currentKey = 0;
+        foreach ($peers as $key => $peer) {
+            if ($peer->getSlug() === $slug) {
+                $target = $peer;
+                $currentKey = $key;
+                break;
+            }
+        }
+        if (!$target) {
+            throw new Exception('Peer not found');
+        }
+
+        $peer = new Peer(
+            $name,
+            $address->getValue(),
+            $target->getPublicKey(),
+            $target->getPrivateKey(),
+            $target->getPresharedKey(),
+        );
+
+        $this->setPeerFile($peer, $server);
+
+        $peers[$currentKey] = $peer;
+        $this->reloadFileConfig($server, $peers);
+
+        return $peer;
+    }
+
+    #[Override]
+    public function deletePeer(string $slug): void
+    {
+        $server = $this->getServer();
+        if ($server === null) {
+            throw new Exception('Server not found');
+        }
+
+        $peers = $this->getPeers();
+        if ($peers === false) {
+            return;
+        }
+
+        $target = null;
+        foreach ($peers as $peer) {
+            if ($peer->getSlug() === $slug) {
+                $target = $peer;
+                break;
+            }
+        }
+        if (!$target) {
+            return;
+        }
+        $this->removeFileOfPeer($target);
+
+        $peers = $this->getPeers();
+        if ($peers === false) {
+            $peers = [];
+        }
+
+        $this->reloadFileConfig($server, $peers);
+    }
+
+    protected function generatePeersDirectory(): void
     {
         @mkdir("{$this->prefix}/wireguard/peers");
     }
 
+    #[Override]
     public function nextAddress(): Ip
     {
+        $output = null;
         exec("grep Address -Rna {$this->prefix}/wireguard/peers | awk '{print $3}'", $output);
         if (count($output) === 0) {
+
+            $ip = null;
             exec("grep Address {$this->prefix}/wireguard/wg0.conf | awk '{print $3}'", $ip);
-            if (count($ip) === 0) {
+            if (!$ip) {
+                throw new Exception('No address found');
+            }
+
+            $newIp = preg_replace('/\d+\/\d+$/', '2', $ip[0]);
+            if ($newIp === null) {
                 throw new Exception('No address found');
             }
             return new Ip(
-                preg_replace('/\d+\/\d+$/', '2', $ip[0])
+                $newIp
             );
         }
+
         sort($output);
         $last = $output[count($output) - 1];
         $ip = preg_replace('/\/\d+$/', '', $last);
+        if ($ip === null) {
+            throw new Exception('No address found');
+        }
+
+        $ipv4 = ip2long($ip);
+
+        if ($ipv4 === false) {
+            throw new Exception('No address found');
+        }
 
         return new Ip(
-            long2ip(ip2long($ip) + 1),
+            long2ip($ipv4 + 1),
         );
     }
 
     public function isPeerNameExists(string $slug): bool
     {
         return file_exists("{$this->prefix}/wireguard/peers/{$slug}.conf");
+    }
+
+    #[Override]
+    public function createPeer(string $name): ?Peer
+    {
+        $this->generatePeersDirectory();
+
+        $server = $this->getServer();
+        if (!$server) {
+            throw new Exception('Server not found');
+        }
+        $slug = Str::slug($name);
+
+        $keys = $this->generateKeysPeers($slug);
+        if ($keys === false) {
+            throw new Exception('Cant generate keys');
+        }
+
+        $peer = new Peer(
+            $name,
+            $this->nextAddress()->getValue(),
+            $keys['publicKey'],
+            $keys['privateKey'],
+            $keys['presharedKey'],
+        );
+
+        $this->setPeerFile($peer, $server);
+        $peers = $this->getPeers();
+        if ($peers === false) {
+            throw new Exception('Cant create peer');
+        }
+        $this->reloadFileConfig($server, $peers);
+
+        return $peer;
     }
 }

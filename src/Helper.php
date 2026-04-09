@@ -11,4 +11,13 @@ class Helper
         }
         return null;
     }
+
+    public static function outputFirstLine(string $command): string|false
+    {
+        $result = exec($command, $output);
+        if (!$result) {
+            return false;
+        }
+        return $output[0];
+    }
 }

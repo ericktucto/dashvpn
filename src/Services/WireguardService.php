@@ -2,45 +2,35 @@
 
 namespace App\Services;
 
-use App\Adapters\Wireguard\FileToPeer;
 use App\Adapters\Wireguard\FileToServer;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use Exception;
-use Illuminate\Support\Str;
+use Override;
 
 class WireguardService implements WireguardServiceInterface
 {
     public function __construct(
         protected FileToServer $adapterServer,
-        protected FileToPeer $adapterPeer,
         protected WireguardWrapperInterface $wrapper,
     ) {
     }
 
+    #[Override]
     public function server(): Server
     {
-        $keys = $this->wrapper->getServerKeys();
-        if (!$keys) {
-            throw new Exception('No keys');
-        }
-
-        $server = $this->wrapper->getServer();
-        if (!$server) {
-            throw new Exception('No initizated server config');
-        }
-
-        return $this->adapterServer->parse($keys, $server);
+        return $this->wrapper->getServer() ?? throw new Exception('Server not found');
     }
 
+    /**
+     * @return Peer[]
+     */
+    #[Override]
     public function peers(): array
     {
         $peers = $this->wrapper->getPeers();
-        return array_map(
-            fn ($peer) => $this->adapterPeer->parse($peer['keys'], $peer['data']),
-            $peers
-        );
+        return is_array($peers) ? $peers : [];
     }
 
     public function createServer(
@@ -49,51 +39,33 @@ class WireguardService implements WireguardServiceInterface
         int $listenPort,
         Ip|null $dns,
     ): Server {
-        $keys = $this->wrapper->generateKeys('wg0');
-
-        $server = new Server(
-            $address->getValue(),
-            $ip->getValue(),
+        return $this->wrapper->createServer(
+            $ip,
+            $address,
             $listenPort,
-            $dns->getValue(),
+            $dns,
         );
-
-        $server->setKeys(
-            $keys['publicKey'],
-            $keys['privateKey'],
-            $keys['presharedKey'],
-        );
-
-        if (!$this->wrapper->createServer($server)) {
-            throw new Exception('Cant create server');
-        }
-
-        return $server;
     }
 
-    public function addPeer(
+    public function createPeer(
         string $name,
     ): Peer {
-        // check exists peers directory
-        $this->wrapper->generatePeersDirectory();
-
-        $slug = Str::slug($name);
-
-        $keys = $this->wrapper->generateKeys(
-            "peers/{$slug}"
-        );
-        $peer = new Peer(
+        $peer = $this->wrapper->createPeer(
             $name,
-            $this->wrapper->nextAddress()->getValue(),
-            $keys['publicKey'],
-            $keys['privateKey'],
-            $keys['presharedKey'],
         );
 
-        if (!$this->wrapper->addPeer($this->server(), $peer)) {
+        if (!$peer) {
             throw new Exception('Cant create peer');
         }
 
         return $peer;
+    }
+
+    public function updatePeer(
+        string $publicKey,
+        string $name,
+        Ip $address,
+    ): Peer {
+        return $this->wrapper->updatePeer($publicKey, $name, $address);
     }
 }

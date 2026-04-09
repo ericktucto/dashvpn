@@ -2,6 +2,7 @@
 
 namespace App\Api\Wireguard;
 
+use App\Domain\Wireguard\Ip;
 use App\Services\WireguardService;
 use App\Services\WireguardWrapperInterface;
 use Illuminate\Support\Str;
@@ -25,23 +26,70 @@ class PeerController
         ]);
     }
 
-    public function create(
+    protected function isPeerNameExists(string $slug): bool
+    {
+        $peers = $this->wrapper->getPeers();
+        if ($peers === false) {
+            return false;
+        }
+        foreach ($peers as $peer) {
+            if ($peer->getSlug() === $slug) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function store(
         Request $request
     ): ResponseInterface {
         $json = json_decode($request->getBody()->getContents());
 
         $slug = Str::slug($json->name);
-        if ($this->wrapper->isPeerNameExists($slug)) {
+        if ($this->isPeerNameExists($slug)) {
             return Response::json([
                 'message' => 'Peer name already exists',
             ], 422);
         }
 
-
         return Response::json([
-            'data' => $this->service->addPeer(
+            'data' => $this->service->createPeer(
                 $json->name,
             )->toArray(),
+        ]);
+    }
+
+    /**
+     * @param array{slug: string} $args
+     */
+    public function update(
+        Request $request,
+        array $args,
+    ): ResponseInterface {
+        $json = json_decode($request->getBody()->getContents());
+
+        $peer = $this->service->updatePeer(
+            $args['slug'],
+            $json->name,
+            new Ip($json->address),
+        );
+
+        return Response::json([
+            'data' => $peer->toArray(),
+            'message' => 'Peer updated',
+        ]);
+    }
+
+    /**
+     * @param array{slug: string} $args
+     */
+    public function destroy(
+        Request $request,
+        array $args,
+    ): ResponseInterface {
+        $this->wrapper->deletePeer($args['slug']);
+        return Response::json([
+            'message' => 'Peer deleted',
         ]);
     }
 }

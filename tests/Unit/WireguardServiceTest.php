@@ -4,49 +4,35 @@ namespace App\Tests\Unit;
 
 use App\Adapters\Wireguard\FileToPeer;
 use App\Adapters\Wireguard\FileToServer;
+use App\Domain\Wireguard\Server;
 use App\Services\WireguardService;
 use App\Services\WireguardWrapperInterface;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Container\ContainerInterface;
 
 class WireguardServiceTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     public function test_can_get_server(): void
     {
-        $lines = explode("\n", file_get_contents('./tests/Unit/Fixtures/wg0.conf'));
-
-        $config = new class {
-            public function get(string $key)
-            {
-                if ($key === 'data') {
-                    return [
-                        'ip' => '127.0.0.1',
-                        'dns' => '8.8.8.8',
-                    ];
-                }
-            }
-        };
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnMap([
-                ['config', $config]
-            ]);
+
+        $serverMock = new Server(
+            '10.8.0.1',
+            '127.0.0.1',
+            34540,
+            '8.8.8.8'
+        );
+        $serverMock->setKeys('C57OCFgebG4EtrWw', 'z3yCGsiZIu5IDzWX', 'jDreKQlSPG3MBSHG');
 
         $mock = $this->createMock(WireguardWrapperInterface::class);
         $mock->expects($this->once())
             ->method('getServer')
-            ->willReturn($lines);
-        $mock->method('getServerKeys')
-            ->willReturn([
-                'publicKey' => 'C57OCFgebG4EtrWw',
-                'privateKey' => 'z3yCGsiZIu5IDzWX',
-                'presharedKey' => 'jDreKQlSPG3MBSHG',
-            ]);
+            ->willReturn($serverMock);
 
         $service = new WireguardService(
             new FileToServer($container),
-            new FileToPeer(),
             $mock,
         );
 
@@ -55,7 +41,7 @@ class WireguardServiceTest extends TestCase
         $this->assertEquals('127.0.0.1', $server->getIp());
         $this->assertEquals('8.8.8.8', $server->getDns());
         $this->assertEquals(34540, $server->getListenPort());
-        $this->assertEquals('10.8.0.1/24', $server->getAddress());
+        $this->assertEquals('10.8.0.1', $server->getAddress());
         $this->assertEquals('C57OCFgebG4EtrWw', $server->getPublicKey());
         $this->assertEquals('z3yCGsiZIu5IDzWX', $server->getPrivateKey());
         $this->assertEquals('jDreKQlSPG3MBSHG', $server->getPresharedKey());

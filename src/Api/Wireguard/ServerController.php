@@ -22,7 +22,7 @@ class ServerController
         ]);
     }
 
-    public function create(
+    public function store(
         Request $request
     ): ResponseInterface {
         $json = json_decode($request->getBody()->getContents());
