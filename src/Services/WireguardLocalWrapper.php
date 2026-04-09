@@ -27,20 +27,6 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
     }
 
     #[Override]
-    public function getServer(): ?Server
-    {
-        $result = (bool) exec("cat {$this->prefix}/wireguard/wg0.conf", $output);
-        if (!$result) {
-            return null;
-        }
-        $keys = $this->getServerKeys();
-        if (!$keys) {
-            throw new Exception('No keys');
-        }
-        return $this->adapterServer->parse($keys, $output);
-    }
-
-    #[Override]
     public function getServerKeys(): array|false
     {
         $keys = [
@@ -69,7 +55,7 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
 
     #[Override]
     /**
-     * @return Peer[]|false
+     * @return list<Peer>|false
      */
     public function getPeers(): array|false
     {
@@ -256,46 +242,6 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
         @mkdir("{$this->prefix}/wireguard/peers");
     }
 
-    #[Override]
-    public function nextAddress(): Ip
-    {
-        $output = null;
-        exec("grep Address -Rna {$this->prefix}/wireguard/peers | awk '{print $3}'", $output);
-        if (count($output) === 0) {
-
-            $ip = null;
-            exec("grep Address {$this->prefix}/wireguard/wg0.conf | awk '{print $3}'", $ip);
-            if (!$ip) {
-                throw new Exception('No address found');
-            }
-
-            $newIp = preg_replace('/\d+\/\d+$/', '2', $ip[0]);
-            if ($newIp === null) {
-                throw new Exception('No address found');
-            }
-            return new Ip(
-                $newIp
-            );
-        }
-
-        sort($output);
-        $last = $output[count($output) - 1];
-        $ip = preg_replace('/\/\d+$/', '', $last);
-        if ($ip === null) {
-            throw new Exception('No address found');
-        }
-
-        $ipv4 = ip2long($ip);
-
-        if ($ipv4 === false) {
-            throw new Exception('No address found');
-        }
-
-        return new Ip(
-            long2ip($ipv4 + 1),
-        );
-    }
-
     public function isPeerNameExists(string $slug): bool
     {
         return file_exists("{$this->prefix}/wireguard/peers/{$slug}.conf");
@@ -319,7 +265,7 @@ class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInte
 
         $peer = new Peer(
             $name,
-            $this->nextAddress()->getValue(),
+            $this->nextAllowAddress()->getValue(),
             $keys['publicKey'],
             $keys['privateKey'],
             $keys['presharedKey'],

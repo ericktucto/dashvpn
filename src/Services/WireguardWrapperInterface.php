@@ -20,7 +20,7 @@ interface WireguardWrapperInterface
     public function getServerKeys(): array|false;
 
     /**
-     * @return Peer[]|false
+     * @return list<Peer>|false
      */
     public function getPeers(): array|false;
 
@@ -38,6 +38,4 @@ interface WireguardWrapperInterface
     public function updatePeer(string $slug, string $name, Ip $address): Peer;
 
     public function deletePeer(string $slug): void;
-
-    public function nextAddress(): Ip;
 }
