@@ -9,9 +9,15 @@ use App\Api\WireguardRoutes;
 use Touch\Application;
 use Touch\Core\Kernel;
 use Touch\Http\Response;
-
+use Tuupola\Middleware\CorsMiddleware;
 
 $app = Application::create(new Kernel());
+
+$app->route()->middleware(
+    new CorsMiddleware(
+        $app->getContainer()->get('config')->get('cors'),
+    )
+);
 
 $app->route()->get("/", fn() => Response::html("Hello world!!!"));
 
