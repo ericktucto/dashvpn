@@ -2,6 +2,7 @@
 
 namespace App\Api;
 
+use App\Domain\AuthInterface;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -19,6 +20,7 @@ final class AuthController
     public function __construct(
         protected ContainerInterface $container,
         protected ConnectionResolverInterface $resolver,
+        protected AuthInterface $auth,
     ) {
         User::setConnectionResolver($this->resolver);
     }
@@ -102,17 +104,11 @@ final class AuthController
                 'message' => 'Password not match',
             ], 422);
         }
-        $headers = $request->getHeader('Authorization');
-        $splitted = explode(' ', $headers[0]);
-        $token = $splitted[1];
-        $key = $this->container->get('config')->get('jwt.key');
-        $decoded = JWT::decode($token, new Key($key, 'HS256'));
 
-        /** @var User|null $user */
-        $user = User::query()->where('username', $decoded->user->username)->first();
+        $user = $this->auth->user();
         if (!$user) {
             return Response::json([
-                'message' => 'Password not match',
+                'message' => 'Invalid credentials',
             ], 422);
         }
         $user->password = $json->password;

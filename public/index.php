@@ -26,7 +26,7 @@ $app->route()
     ->post("/api/register", [AuthController::class, 'register'])
     ->middleware(new PrivateMiddleware($app->getContainer()));
 
-$authMiddleware = new AuthMiddleware($app->getContainer());
+$authMiddleware = $app->getContainer()->make(AuthMiddleware::class);
 
 $app->route()
     ->post("/api/change-password", [AuthController::class, 'changePassword'])

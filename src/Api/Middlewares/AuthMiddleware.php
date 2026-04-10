@@ -2,8 +2,11 @@
 
 namespace App\Api\Middlewares;
 
+use App\Domain\AuthInterface;
+use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Database\ConnectionResolverInterface;
 use Override;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +19,10 @@ final class AuthMiddleware implements MiddlewareInterface
 {
     public function __construct(
         protected ContainerInterface $container,
+        protected AuthInterface $auth,
+        protected ConnectionResolverInterface $resolver,
     ) {
+        User::setConnectionResolver($resolver);
     }
 
     #[Override]
@@ -37,7 +43,15 @@ final class AuthMiddleware implements MiddlewareInterface
         $key = $this->container->get('config')->get('jwt.key');
 
         try {
-            JWT::decode($token, new Key($key, 'HS256'));
+            $decoded = JWT::decode($token, new Key($key, 'HS256'));
+
+            /** @var ?User $user */
+            $user = User::query()->where("username", $decoded->user->username)->first();
+            if (!$user) {
+                return Response::json(['message' => 'Unauthorized'], 401);
+            }
+
+            $this->auth->setUser($user);
         } catch (\Exception $e) {
             return Response::json(['message' => 'Unauthorized'], 401);
         }
