@@ -1,14 +1,17 @@
-import { decodeJWT } from "@/lib/utils";
-import type { From, To } from "../types";
+import type { To } from "../types";
+import { decode } from "@/lib/jwt";
 
 export async function isAuthenticated() {
-    const token = localStorage.getItem('token') ?? '';
+    const token = localStorage.getItem('token');
+
+    if (!token) return false;
+
     try {
-        const decoded = decodeJWT(token);
+        const decoded = decode(token);
         return new Date(decoded.exp * 1000) > new Date();
-    } catch (e) {
+    } catch {
+        return false;
     }
-    return false
 }
 
 const guest = [
@@ -17,12 +20,19 @@ const guest = [
     'auth@forgot-password',
 ]
 
-export default async function (to: To, _: From) {
-    const check = await isAuthenticated();
-    if (check && guest.includes(to.name as string)) {
-        return { name: 'dashboard' }
-    }
-    if (!check && !guest.includes(to.name as string)) {
+export default async function (to: To) {
+    console.log("DEBUG", to.name);
+    const isAuth = await isAuthenticated();
+
+    // No autenticado → bloquear privadas
+    if (!isAuth && !guest.includes(to.name as string)) {
+        console.log("DEBUG", 'login');
         return { name: 'auth@login' }
+    }
+
+    // Autenticado → bloquear páginas de auth
+    if (isAuth && guest.includes(to.name as string)) {
+        console.log("DEBUG", 'dashboard');
+        return { name: 'dashboard' }
     }
 }
