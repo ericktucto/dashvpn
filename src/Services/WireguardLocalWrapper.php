@@ -13,6 +13,7 @@ use App\Helper;
 use Exception;
 use Illuminate\Support\Str;
 use Override;
+use Psr\Container\ContainerInterface;
 
 final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInterface, ServerManageInterface
 {
@@ -22,6 +23,7 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
     public function __construct(
         protected FileToServer $adapterServer,
         protected string $prefix,
+        protected ContainerInterface $container,
     ) {
     }
 
@@ -66,6 +68,12 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
         return $peers;
     }
 
+    #[Override]
+    public function getConfigPeer(string $slug): string|false
+    {
+        return file_get_contents("{$this->prefix}/wireguard/peers/{$slug}.conf");
+    }
+
     public function generateKeys(
         string $target,
     ): array|false {
@@ -87,16 +95,16 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
 
     #[Override]
     public function createServer(
-        Ip $ip,
         Ip $address,
         int $listenPort,
-        Ip|null $dns,
     ): Server {
+        $ip = new Ip($this->container->get('config')->get('data.ip'));
+        $dns = new Ip($this->container->get('config')->get('data.dns'));
         $server = new Server(
             $address->getValue(),
             $ip->getValue(),
             $listenPort,
-            $dns?->getValue() ?? '',
+            $dns->getValue(),
         );
 
         $keys = $this->generateKeys('wg0');

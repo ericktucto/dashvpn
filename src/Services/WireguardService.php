@@ -35,16 +35,12 @@ final class WireguardService implements WireguardServiceInterface
     }
 
     public function createServer(
-        Ip $ip,
         Ip $address,
         int $listenPort,
-        Ip|null $dns,
     ): Server {
         return $this->wrapper->createServer(
-            $ip,
             $address,
             $listenPort,
-            $dns,
         );
     }
 

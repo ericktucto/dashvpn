@@ -20,5 +20,6 @@ final class WireguardRoutes extends Route
         $group->post('/peers', [PeerController::class, 'store']);
         $group->put('/peers/{slug}', [PeerController::class, 'update']);
         $group->delete('/peers/{slug}', [PeerController::class, 'destroy']);
+        $group->get('/peers/{slug}/config', [PeerController::class, 'config']);
     }
 }

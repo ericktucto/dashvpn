@@ -29,6 +29,11 @@ export function deletePeer(slug: string) {
 export type PostPeer = {
     name: string
 }
+
+export type PutPeer = {
+    name: string
+    address: string
+}
 export function postPeer(name: string) {
     return axios.post<
         Peer,
@@ -37,3 +42,14 @@ export function postPeer(name: string) {
     >('/api/wireguard/peers', { name })
 }
 
+export function putPeer(slug: string, data: PutPeer) {
+    return axios.put<
+        Peer,
+        AxiosResponse<{ data: Peer, message: string }>,
+        PutPeer
+    >(`/api/wireguard/peers/${slug}`, data)
+}
+
+export function getConfigPeer(slug: string) {
+    return axios.get(`/api/wireguard/peers/${slug}/config`)
+}

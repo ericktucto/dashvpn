@@ -38,10 +38,8 @@ final class ServerController
 
         return Response::json([
             'data' => $this->service->createServer(
-                new Ip($json->ip),
                 new Ip($json->address),
                 (int) $json->listen_port,
-                new Ip($json->dns ?? '1.1.1.1'),
             )->toArray(),
         ]);
     }

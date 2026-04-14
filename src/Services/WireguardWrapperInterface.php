@@ -11,10 +11,8 @@ interface WireguardWrapperInterface
     public function getServer(): ?Server;
 
     public function createServer(
-        Ip $ip,
         Ip $address,
         int $listenPort,
-        Ip|null $dns,
     ): Server;
 
     /**
@@ -27,4 +25,6 @@ interface WireguardWrapperInterface
     public function updatePeer(string $slug, string $name, Ip $address): Peer;
 
     public function deletePeer(string $slug): void;
+
+    public function getConfigPeer(string $slug): string|false;
 }

@@ -5,6 +5,7 @@ namespace App\Api\Wireguard;
 use App\Domain\Wireguard\Ip;
 use App\Services\WireguardService;
 use App\Services\WireguardWrapperInterface;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
@@ -99,5 +100,17 @@ final class PeerController
         return Response::json([
             'message' => 'Peer deleted',
         ]);
+    }
+
+    public function config(
+        Request $_request,
+        array $args,
+    ): ResponseInterface {
+        $content = (string) $this->wrapper->getConfigPeer($args['slug']);
+        $headers = ["Content-Type" => "text/plain", "Content-Length" => strlen($content)];
+        $response = new GuzzleResponse(200, $headers);
+        $response->getBody()->write($content);
+        $response->getBody()->rewind();
+        return $response;
     }
 }

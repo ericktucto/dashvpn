@@ -12,7 +12,7 @@ defineEmits<{
 <template>
     <h3 class="p-4">WIREGUARD</h3>
     <ul class="p-4">
-        <li>
+        <li class="mb-2">
             <Button class="w-full justify-start" :variant="active === 'peers' ? 'default' : 'ghost'"
                 @click="$emit('go', '/peers')">
                 <NetworkIcon />

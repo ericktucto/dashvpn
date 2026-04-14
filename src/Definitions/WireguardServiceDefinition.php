@@ -25,6 +25,7 @@ final class WireguardServiceDefinition
         return new WireguardLocalWrapper(
             $adapterServer,
             $container->get('path'),
+            $container,
         );
     }
 }
