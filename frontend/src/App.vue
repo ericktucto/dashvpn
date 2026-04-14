@@ -47,11 +47,11 @@ onMounted(() => {
 </script>
 <template>
     <div class="grid w-screen h-screen" :class="[isAuth ? 'grid-cols-[1fr] md:grid-cols-[200px_1fr]' : '']">
-        <aside class="hidden md:block w-[200px] border-r">
+        <aside class="hidden w-[200px] border-r" :class="[isAuth ? 'md:block' : 'hidden']">
             <AsideContent :active="current" @go="(path) => router.push(path)" />
         </aside>
-        <div class="grid grid-rows-[auto_1fr]">
-            <nav class="flex justify-between md:justify-end p-4 border-b">
+        <div class="grid" :class="[isAuth ? 'grid-rows-[auto_1fr]' : '']">
+            <nav class="justify-between md:justify-end p-4 border-b" :class="[isAuth ? 'flex' : 'hidden']">
                 <AsideSheet class="md:hidden block">
                     <AsideContent :active="current" @go="(path) => router.push(path)" />
                 </AsideSheet>

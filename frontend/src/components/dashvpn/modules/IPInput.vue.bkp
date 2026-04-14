@@ -1,0 +1,27 @@
+<script setup lang="ts">
+import type Ip from '../types/ip';
+import InputGroupInput from '@/components/ui/input-group/InputGroupInput.vue';
+import InputGroup from '@/components/ui/input-group/InputGroup.vue';
+import InputGroupText from '@/components/ui/input-group/InputGroupText.vue';
+
+defineModel<Ip>({
+    required: true,
+})
+
+function handleInput(e: Event, type: keyof Ip) {
+    console.log(e.target)
+}
+</script>
+<template>
+    <InputGroup as-child>
+        <div class="grid grid-cols-7 content-center">
+            <InputGroupInput type="number" :value="modelValue.first" @change="handleInput($event, 'first')" />
+            <InputGroupText>.</InputGroupText>
+            <InputGroupInput type="number" :value="modelValue.second" @change="handleInput($event, 'second')" />
+            <InputGroupText>.</InputGroupText>
+            <InputGroupInput type="number" :value="modelValue.third" @change="handleInput($event, 'third')" />
+            <InputGroupText>.</InputGroupText>
+            <InputGroupInput type="number" :value="modelValue.fourth" @change="handleInput($event, 'fourth')" />
+        </div>
+    </InputGroup>
+</template>
