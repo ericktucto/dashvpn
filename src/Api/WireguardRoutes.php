@@ -16,6 +16,7 @@ final class WireguardRoutes extends Route
         $group->get('/server', [ServerController::class, 'index']);
         $group->post('/server', [ServerController::class, 'store']);
 
+        $group->get('/peers/next-address', [PeerController::class, 'nextAllowAddress']);
         $group->get('/peers', [PeerController::class, 'index']);
         $group->post('/peers', [PeerController::class, 'store']);
         $group->put('/peers/{slug}', [PeerController::class, 'update']);

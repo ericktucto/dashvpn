@@ -76,16 +76,22 @@ final class PeerController
     ): ResponseInterface {
         $json = json_decode($request->getBody()->getContents());
 
-        $peer = $this->service->updatePeer(
-            $args['slug'],
-            $json->name,
-            new Ip($json->address),
-        );
+        try {
+            $peer = $this->service->updatePeer(
+                $args['slug'],
+                $json->name,
+                new Ip($json->address),
+            );
 
-        return Response::json([
-            'data' => $peer->toArray(),
-            'message' => 'Peer updated',
-        ]);
+            return Response::json([
+                'data' => $peer->toArray(),
+                'message' => 'Peer updated',
+            ]);
+        } catch (\Exception $e) {
+            return Response::json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     /**
@@ -112,5 +118,13 @@ final class PeerController
         $response->getBody()->write($content);
         $response->getBody()->rewind();
         return $response;
+    }
+
+    public function nextAllowAddress(): ResponseInterface {
+        return Response::json([
+            'data' => [
+                'address' => $this->wrapper->nextAllowAddress()->getValue(),
+            ]
+        ]);
     }
 }

@@ -53,3 +53,10 @@ export function putPeer(slug: string, data: PutPeer) {
 export function getConfigPeer(slug: string) {
     return axios.get(`/api/wireguard/peers/${slug}/config`)
 }
+
+export function getNextAddress() {
+    return axios.get<
+        {},
+        AxiosResponse<{ data: { address: string } }>
+    >('/api/wireguard/peers/next-address')
+}

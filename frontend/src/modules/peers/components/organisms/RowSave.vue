@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { BanIcon, SaveIcon } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
+import { getNextAddress } from '../../services/fetch';
 
 const name = ref('')
 const nextIp = ref('')
@@ -14,8 +16,9 @@ defineEmits<{
 }>()
 
 onMounted(() => {
-    // @todo obtener el next ip disponible
-    nextIp.value = '10.8.0.12'
+    getNextAddress().then((res) => {
+        nextIp.value = res.data.data.address
+    })
 })
 </script>
 <template>
@@ -27,7 +30,7 @@ onMounted(() => {
             {{ nextIp }}
         </TableCell>
         <TableCell>
-            activo
+            <Switch :modelValue="true" />
         </TableCell>
         <TableCell class="text-right pr-8">
             <div class="flex justify-end gap-6">

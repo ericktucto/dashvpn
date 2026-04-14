@@ -147,10 +147,12 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
         $target = null;
         $currentKey = 0;
         foreach ($peers as $key => $peer) {
+            if ($peer->getAddress() === $address->getValue() && $peer->getSlug() !== $slug) {
+                throw new Exception('Ip already used');
+            }
             if ($peer->getSlug() === $slug) {
                 $target = $peer;
                 $currentKey = $key;
-                break;
             }
         }
         if (!$target) {
@@ -248,5 +250,48 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
         $this->reloadFileConfig($server, $peers);
 
         return $peer;
+    }
+
+    #[Override]
+    public function nextAllowAddress(): Ip
+    {
+        $server = $this->getServer();
+        if (!$server) {
+            throw new Exception('Server not found');
+        }
+
+        $output = [];
+        exec("cat {$this->prefix}/wireguard/wg0.conf | grep AllowedIPs | awk '{print $3}'", $output);
+
+        /** @var list<int> $numbers */
+        $numbers = array_map(function (string $ip) {
+            $number = (int) preg_replace("/^[0-9]+\.[0-9]+.[0-9]+.([0-9]+)\/32$/", "$1", $ip);
+            return $number;
+        }, $output);
+
+        sort($numbers);
+
+        $ip = count($output) > 0 ? preg_replace("/\/32/", "", $output[0]) : null;
+        if (!is_string($ip)) {
+            throw new Exception('Invalid ip');
+        }
+
+        $i = 0;
+        foreach ($numbers as $number) {
+            if ($number !== ($i + 2)) {
+                $newIp = preg_replace("/([0-9]+)$/", (string) ($i + 2), $ip);
+                return is_string($newIp)
+                    ? new Ip($newIp)
+                    : throw new Exception('Invalid ip');
+            }
+            $i++;
+        }
+        $number = ip2long($server->getAddress());
+        if ($number === false) {
+            throw new Exception('Invalid ip');
+        }
+        return new Ip(
+            long2ip($number + 1)
+        );
     }
 }

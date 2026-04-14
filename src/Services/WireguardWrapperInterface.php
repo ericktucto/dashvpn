@@ -26,5 +26,7 @@ interface WireguardWrapperInterface
 
     public function deletePeer(string $slug): void;
 
+    public function nextAllowAddress(): Ip;
+
     public function getConfigPeer(string $slug): string|false;
 }

@@ -49,41 +49,6 @@ trait HasServerLocalManage
         return $keys;
     }
 
-
-    public function nextAllowAddress(): Ip
-    {
-        $server = $this->getServer();
-        if (!$server) {
-            throw new Exception('Server not found');
-        }
-
-        $output = [];
-        exec("cat {$this->prefix}/wireguard/wg0.conf | grep AllowedIPs | awk '{print $3}'", $output);
-
-        sort($output);
-        for ($i = 0; $i < count($output); $i++) {
-            $ip = preg_replace("/\/32/", "", $output[$i]);
-            if (!is_string($ip)) {
-                throw new Exception('Invalid ip');
-            }
-
-            $number = (int) preg_replace("/^[0-9]+\.[0-9]+.[0-9]+.([0-9]+)$/", "$1", $ip);
-            if ($number !== ($i + 2)) {
-                $newIp = preg_replace("/([0-9]+)$/", (string) ($i + 2), $ip);
-                return is_string($newIp)
-                    ? new Ip($newIp)
-                    : throw new Exception('Invalid ip');
-            }
-        }
-        $number = ip2long($server->getAddress());
-        if ($number === false) {
-            throw new Exception('Invalid ip');
-        }
-        return new Ip(
-            long2ip($number + 1)
-        );
-    }
-
     /**
      * @param \App\Domain\Wireguard\Peer[] $peers
      */
