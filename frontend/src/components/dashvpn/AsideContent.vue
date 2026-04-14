@@ -13,16 +13,17 @@ defineEmits<{
     <h3 class="p-4">WIREGUARD</h3>
     <ul class="p-4">
         <li>
+            <Button class="w-full justify-start" :variant="active === 'peers' ? 'default' : 'ghost'"
+                @click="$emit('go', '/peers')">
+                <NetworkIcon />
+                Peers
+            </Button>
+        </li>
+        <li>
             <Button class="w-full justify-start" :variant="active === 'server' ? 'default' : 'ghost'"
                 @click="$emit('go', '/server')">
                 <ServerIcon />
                 Server
-            </Button>
-        </li>
-        <li>
-            <Button class="w-full justify-start" :variant="active === 'peers' ? 'default' : 'ghost'">
-                <NetworkIcon />
-                Peers
             </Button>
         </li>
     </ul>

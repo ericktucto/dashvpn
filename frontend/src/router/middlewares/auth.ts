@@ -32,7 +32,6 @@ export default async function (to: To) {
 
     // Autenticado → bloquear páginas de auth
     if (isAuth && guest.includes(to.name as string)) {
-        console.log("DEBUG", 'dashboard');
-        return { name: 'dashboard' }
+        return { name: 'peers@index' }
     }
 }

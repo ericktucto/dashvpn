@@ -24,7 +24,7 @@ async function handleSubmit() {
     try {
         const response = await login(username.value, password.value);
         localStorage.setItem('token', response.data.data);
-        router.push({ name: 'dashboard' })
+        router.push({ name: 'peers@index' })
     } catch (error) {
         if (isAxiosError(error) && error.response) {
             toast.error(error.response.data.message)
