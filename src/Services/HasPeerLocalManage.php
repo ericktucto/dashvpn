@@ -13,9 +13,9 @@ trait HasPeerLocalManage
 
     public function removeFileOfPeer(Peer $peer): void
     {
-        unlink("{$this->prefix}/wireguard/peers/{$peer->getSlug()}.conf");
-        unlink("{$this->prefix}/wireguard/peers/{$peer->getSlug()}.pub");
-        unlink("{$this->prefix}/wireguard/peers/{$peer->getSlug()}.key");
+        unlink("{$this->prefix}/peers/{$peer->getSlug()}.conf");
+        unlink("{$this->prefix}/peers/{$peer->getSlug()}.pub");
+        unlink("{$this->prefix}/peers/{$peer->getSlug()}.key");
     }
 
     /**
@@ -27,19 +27,19 @@ trait HasPeerLocalManage
      */
     public function generateKeysPeers(string $target): array|false
     {
-        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/peers/{$target}.pub");
-        $pub = Helper::outputFirstLine("cat {$this->prefix}/wireguard/peers/{$target}.pub");
+        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/peers/{$target}.pub");
+        $pub = Helper::outputFirstLine("cat {$this->prefix}/peers/{$target}.pub");
         if ($pub === false) {
             return false;
         }
 
-        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wireguard/peers/{$target}.key");
-        $key = Helper::outputFirstLine("cat {$this->prefix}/wireguard/peers/{$target}.key");
+        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/peers/{$target}.key");
+        $key = Helper::outputFirstLine("cat {$this->prefix}/peers/{$target}.key");
         if ($key === false) {
             return false;
         }
 
-        $psk = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
+        $psk = Helper::outputFirstLine("cat {$this->prefix}/wg0.psk");
         if ($psk === false) {
             return false;
         }
@@ -55,6 +55,6 @@ trait HasPeerLocalManage
     {
         $builder = new PeerConfig($server, $peer);
         $lines = $builder->generate();
-        file_put_contents("{$this->prefix}/wireguard/peers/{$peer->getSlug()}.conf", $lines);
+        file_put_contents("{$this->prefix}/peers/{$peer->getSlug()}.conf", $lines);
     }
 }

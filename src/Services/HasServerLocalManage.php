@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Builders\ServerConfig;
-use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Server;
 use App\Helper;
 use Exception;
@@ -12,7 +11,7 @@ trait HasServerLocalManage
 {
     public function getServer(): ?Server
     {
-        $result = (bool) exec("cat {$this->prefix}/wireguard/wg0.conf", $output);
+        $result = (bool) exec("cat {$this->prefix}/wg0.conf", $output);
         if (!$result) {
             return null;
         }
@@ -30,17 +29,17 @@ trait HasServerLocalManage
             'privateKey' => '',
             'presharedKey' => '',
         ];
-        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.pub");
+        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wg0.pub");
         if ($keys['publicKey'] === false) {
             return false;
         }
 
-        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.key");
+        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wg0.key");
         if ($keys['privateKey'] === false) {
             return false;
         }
 
-        $psk = Helper::outputFirstLine("cat {$this->prefix}/wireguard/wg0.psk");
+        $psk = Helper::outputFirstLine("cat {$this->prefix}/wg0.psk");
         if ($psk === false) {
             return false;
         }
@@ -57,7 +56,7 @@ trait HasServerLocalManage
         $builder = new ServerConfig($server, $peers);
         $lines = $builder->generate();
 
-        file_put_contents("{$this->prefix}/wireguard/wg0.conf", $lines);
+        file_put_contents("{$this->prefix}/wg0.conf", $lines);
 
         // @todo clear peers
     }

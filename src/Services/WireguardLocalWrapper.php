@@ -33,7 +33,7 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
      */
     public function getPeers(): array|false
     {
-        $result = (bool) exec("ls {$this->prefix}/wireguard/peers/*.conf", $output);
+        $result = (bool) exec("ls {$this->prefix}/peers/*.conf", $output);
         if (!$result || !$output) {
             return false;
         }
@@ -71,7 +71,7 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
     #[Override]
     public function getConfigPeer(string $slug): string|false
     {
-        return file_get_contents("{$this->prefix}/wireguard/peers/{$slug}.conf");
+        return file_get_contents("{$this->prefix}/peers/{$slug}.conf");
     }
 
     public function generateKeys(
@@ -125,8 +125,8 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
 
     protected function setKeys(string $slug, string $pub, string $prv): void
     {
-        file_put_contents("{$this->prefix}/wireguard/peers/{$slug}.pub", $pub);
-        file_put_contents("{$this->prefix}/wireguard/peers/{$slug}.key", $prv);
+        file_put_contents("{$this->prefix}/peers/{$slug}.pub", $pub);
+        file_put_contents("{$this->prefix}/peers/{$slug}.key", $prv);
     }
 
     #[Override]
@@ -215,7 +215,7 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
 
     protected function generatePeersDirectory(): void
     {
-        @mkdir("{$this->prefix}/wireguard/peers");
+        @mkdir("{$this->prefix}/peers");
     }
 
     #[Override]
@@ -260,18 +260,24 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
             throw new Exception('Server not found');
         }
 
-        $output = [];
-        exec("cat {$this->prefix}/wireguard/wg0.conf | grep AllowedIPs | awk '{print $3}'", $output);
+        $peers = $this->getPeers();
 
-        /** @var list<int> $numbers */
-        $numbers = array_map(function (string $ip) {
-            $number = (int) preg_replace("/^[0-9]+\.[0-9]+.[0-9]+.([0-9]+)\/32$/", "$1", $ip);
+        if ($peers === false) {
+            $newIp = preg_replace("/([0-9]+)$/", "2", $server->getAddress());
+            return is_string($newIp) ? new Ip(
+                $newIp
+            ) : throw new Exception('Invalid ip');
+        }
+
+        $numbers = array_map(function (Peer $peer) {
+            $ip = $peer->getAddress();
+            $number = (int) preg_replace("/^[0-9]+\.[0-9]+.[0-9]+.([0-9]+)$/", "$1", $ip);
             return $number;
-        }, $output);
+        }, $peers);
 
         sort($numbers);
 
-        $ip = count($output) > 0 ? preg_replace("/\/32/", "", $output[0]) : null;
+        $ip = preg_replace("/\/32/", "", $peers[0]->getAddress());
         if (!is_string($ip)) {
             throw new Exception('Invalid ip');
         }

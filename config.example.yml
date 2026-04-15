@@ -17,5 +17,6 @@ jwt:
   key: example
   expires: 3600
 data:
+  config_dir: '/home/ubunutu/.config/wireguard'
   ip: 127.0.0.1
   dns: 1.1.1.1
