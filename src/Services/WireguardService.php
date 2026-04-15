@@ -6,19 +6,17 @@ use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use Exception;
-use Override;
 
-final class WireguardService implements WireguardServiceInterface
+final class WireguardService
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
-        protected WireguardWrapperInterface $wrapper,
+        protected WireguardWrapper $wrapper,
     ) {
     }
 
-    #[Override]
     public function server(): Server
     {
         return $this->wrapper->getServer() ?? throw new Exception('Server not found');
@@ -27,7 +25,6 @@ final class WireguardService implements WireguardServiceInterface
     /**
      * @return Peer[]
      */
-    #[Override]
     public function peers(): array
     {
         $peers = $this->wrapper->getPeers();

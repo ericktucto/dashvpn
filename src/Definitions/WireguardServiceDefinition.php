@@ -3,9 +3,9 @@
 namespace App\Definitions;
 
 use App\Adapters\Wireguard\FileToServer;
-use App\Services\WireguardLocalWrapper;
+use App\Services\ServerLocalManage;
+use App\Services\ServerManageInterface;
 //use App\Services\WireguardWrapper;
-use App\Services\WireguardWrapperInterface;
 use Psr\Container\ContainerInterface;
 
 final class WireguardServiceDefinition
@@ -16,15 +16,14 @@ final class WireguardServiceDefinition
     public static function create(
         ContainerInterface $container,
         FileToServer $adapterServer,
-    ): WireguardWrapperInterface {
+    ): ServerManageInterface {
         /*
         if ($container->get('config')->get('env') === 'production') {
             return new WireguardWrapper();
         }
         */
-        return new WireguardLocalWrapper(
+        return new ServerLocalManage(
             $adapterServer,
-            $container->get('config')->get('data.config_dir'),
             $container,
         );
     }

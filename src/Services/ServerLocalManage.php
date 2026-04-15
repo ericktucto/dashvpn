@@ -2,27 +2,53 @@
 
 namespace App\Services;
 
+use App\Adapters\Wireguard\FileToServer;
 use App\Builders\ServerConfig;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Server;
 use App\Helper;
+use DI\Attribute\Inject;
 use Exception;
+use Noodlehaus\Config;
+use Override;
 use Psr\Container\ContainerInterface;
 
 /**
  * @todo crear la version para wg-quick
  */
-trait HasServerLocalManage
+final class ServerLocalManage implements ServerManageInterface
 {
     protected string $prefix;
-    protected ContainerInterface $container;
 
+    public function __construct(
+        protected FileToServer $adapterServer,
+        protected ContainerInterface $container,
+    ) {
+        $this->prefix = $this->getConfigData('data.config_dir');
+    }
+
+    protected function getConfigData(string $key): string
+    {
+        $value = $this->container->get('config')->get($key);
+
+        if (!is_string($value)) {
+            throw new Exception("Config key '{$key}' must be a string");
+        }
+
+        return $value;
+    }
+
+    #[Override]
     public function createServer(
         Ip $address,
         int $listenPort,
     ): Server {
-        $ip = new Ip($this->container->get('config')->get('data.ip'));
-        $dns = new Ip($this->container->get('config')->get('data.dns'));
+        $ip = new Ip(
+            $this->getConfigData('data.ip'),
+        );
+        $dns = new Ip(
+            $this->getConfigData('data.dns'),
+        );
         $server = new Server(
             $address->getValue(),
             $ip->getValue(),
@@ -46,6 +72,7 @@ trait HasServerLocalManage
         return $server;
     }
 
+    #[Override]
     public function getServer(): ?Server
     {
         $result = (bool) exec("cat {$this->prefix}/wg0.conf", $output);
@@ -59,6 +86,7 @@ trait HasServerLocalManage
         return $this->adapterServer->parse($keys, $output);
     }
 
+    #[Override]
     /**
      * @return array{
      *  publicKey: string,
@@ -81,6 +109,7 @@ trait HasServerLocalManage
         ];
     }
 
+    #[Override]
     /**
      * @return array{
      *  publicKey: string,
@@ -114,6 +143,7 @@ trait HasServerLocalManage
         return $keys;
     }
 
+    #[Override]
     /**
      * @param \App\Domain\Wireguard\Peer[] $peers
      */

@@ -3,10 +3,10 @@
 use App\Definitions\AuthDefinition;
 use App\Definitions\WireguardServiceDefinition;
 use App\Domain\AuthInterface;
-use App\Services\WireguardWrapperInterface;
+use App\Services\ServerManageInterface;
 use function DI\factory;
 
 return [
     AuthInterface::class => factory([AuthDefinition::class, "create"]),
-    WireguardWrapperInterface::class => factory([WireguardServiceDefinition::class, "create"]),
+    ServerManageInterface::class => factory([WireguardServiceDefinition::class, "create"]),
 ];

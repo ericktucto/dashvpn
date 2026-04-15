@@ -4,7 +4,7 @@ namespace App\Api\Wireguard;
 
 use App\Domain\Wireguard\Ip;
 use App\Services\WireguardService;
-use App\Services\WireguardWrapperInterface;
+use App\Services\WireguardWrapper;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
@@ -18,7 +18,7 @@ final class PeerController
      */
     public function __construct(
         protected WireguardService $service,
-        protected WireguardWrapperInterface $wrapper,
+        protected WireguardWrapper $wrapper,
     ) {
     }
 

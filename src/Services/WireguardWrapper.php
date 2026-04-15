@@ -10,30 +10,50 @@ use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use App\Helper;
+use DI\Attribute\Inject;
 use Exception;
 use Illuminate\Support\Str;
-use Override;
+use Noodlehaus\Config;
 use Psr\Container\ContainerInterface;
 
-final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerManageInterface, ServerManageInterface
+/**
+ * @todo No es final por que se esta usando en los tests
+ */
+class WireguardWrapper implements PeerManageInterface
 {
     use HasPeerManage;
-    use HasServerLocalManage;
 
+    protected string $prefix;
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function __construct(
-        protected FileToServer $adapterServer,
-        protected string $prefix,
         protected ContainerInterface $container,
+        protected ServerManageInterface $manager,
     ) {
+        $prefix = $container->get('config')->get('data.config_dir');
+        if (!is_string($prefix)) {
+            throw new Exception('Cant get config dir');
+        }
+        $this->prefix = $prefix;
     }
 
-    #[Override]
+    public function getServer(): ?Server
+    {
+        return $this->manager->getServer();
+    }
+
+    public function createServer(Ip $address, int $listenPort): Server
+    {
+        return $this->manager->createServer($address, $listenPort);
+    }
+
     public function getConfigPeer(string $slug): string|false
     {
         return file_get_contents("{$this->prefix}/peers/{$slug}.conf");
     }
 
-    #[Override]
     public function updatePeer(
         string $slug,
         string $name,
@@ -80,12 +100,11 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
         $this->setPeerFile($peer, $server);
 
         $peers[$currentKey] = $peer;
-        $this->reloadFileConfig($server, $peers);
+        $this->manager->reloadFileConfig($server, $peers);
 
         return $peer;
     }
 
-    #[Override]
     public function deletePeer(string $slug): void
     {
         $server = $this->getServer();
@@ -115,10 +134,9 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
             $peers = [];
         }
 
-        $this->reloadFileConfig($server, $peers);
+        $this->manager->reloadFileConfig($server, $peers);
     }
 
-    #[Override]
     public function createPeer(string $name): ?Peer
     {
         $this->generatePeersDirectory();
@@ -147,12 +165,11 @@ final class WireguardLocalWrapper implements WireguardWrapperInterface, PeerMana
         if ($peers === false) {
             throw new Exception('Cant create peer');
         }
-        $this->reloadFileConfig($server, $peers);
+        $this->manager->reloadFileConfig($server, $peers);
 
         return $peer;
     }
 
-    #[Override]
     public function nextAllowAddress(): Ip
     {
         $address = $this->getServer()?->getAddress() ?? null;

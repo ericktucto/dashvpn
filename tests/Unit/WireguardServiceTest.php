@@ -4,7 +4,7 @@ namespace App\Tests\Unit;
 
 use App\Domain\Wireguard\Server;
 use App\Services\WireguardService;
-use App\Services\WireguardWrapperInterface;
+use App\Services\WireguardWrapper;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
@@ -21,7 +21,7 @@ class WireguardServiceTest extends TestCase
         );
         $serverMock->setKeys('C57OCFgebG4EtrWw', 'z3yCGsiZIu5IDzWX', 'jDreKQlSPG3MBSHG');
 
-        $mock = $this->createMock(WireguardWrapperInterface::class);
+        $mock = $this->createMock(WireguardWrapper::class);
         $mock->expects($this->once())
             ->method('getServer')
             ->willReturn($serverMock);

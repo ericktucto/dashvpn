@@ -21,6 +21,7 @@
             "Composer\\Config::disableProcessTimeout",
             "@php -S 0.0.0.0:8686 -t public"
         ],
+        "test": "vendor/bin/phpunit --colors=always",
         "psalm": "vendor/bin/psalm --no-cache --show-info=true --error-level=1"
     },
     "minimum-stability": "stable",
