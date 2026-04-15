@@ -18,5 +18,10 @@ interface PeerManageInterface
      */
     public function generateKeysPeers(string $target): array|false;
 
+    /**
+     * @return list<Peer>|false
+     */
+    public function getPeers(): array|false;
+
     public function setPeerFile(Peer $peer, Server $server): void;
 }
