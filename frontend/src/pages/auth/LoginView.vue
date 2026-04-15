@@ -6,7 +6,7 @@ import FormSign from '@/modules/auth/components/organisms/FormSign.vue';
     <ContainerCenter>
         <div class="grid justify-center">
             <div class="max-w-[400px]">
-                <FormSign class="w-[400px]" />
+                <FormSign class="md:w-[400px]" />
             </div>
         </div>
     </ContainerCenter>

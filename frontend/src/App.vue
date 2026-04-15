@@ -51,7 +51,8 @@ onMounted(() => {
             <AsideContent :active="current" @go="(path) => router.push(path)" />
         </aside>
         <div class="grid" :class="[isAuth ? 'grid-rows-[auto_1fr]' : '']">
-            <nav class="justify-between md:justify-end p-4 border-b" :class="[isAuth ? 'flex' : 'hidden']">
+            <nav class="justify-between fixed w-full bg-white z-10 md:static md:justify-end p-4 border-b"
+                :class="[isAuth ? 'flex' : 'hidden']">
                 <AsideSheet class="md:hidden block">
                     <AsideContent :active="current" @go="(path) => router.push(path)" />
                 </AsideSheet>

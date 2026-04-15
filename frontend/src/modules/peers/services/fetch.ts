@@ -10,7 +10,6 @@ export interface Peer {
     address: string;
     publicKey: string;
     slug: string;
-
 }
 
 export type ResponseGetPeers = Peer[]

@@ -1,0 +1,5 @@
+- [ ] Al crear un Peer debe ser posible elegir el address que se desee
+- [ ] Guardar los peers en una carpeta peers, tomar todos los peers y pasarlos a la configuración del archivo wg0.conf y luego cargar el archivo wg0.conf
+- [ ] Colocar la definicion del servidor en base de datos, dejando la creacion el archivo como abstracto
+- [ ] Permitir desactivar peers
+- [ ] Crear backend para compartir peer por 15 minutos

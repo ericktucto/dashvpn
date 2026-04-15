@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/table'
 import ContainerCenter from '@/layouts/ContainerCenter.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { deletePeer, getConfigPeer, getPeers, postPeer, putPeer, type Peer } from '../services/fetch';
+import { deletePeer, getConfigPeer, getPeers, postPeer, putPeer, type Peer, type PutPeer } from '../services/fetch';
 import { Button } from '@/components/ui/button';
-import { BanIcon, DownloadIcon, EditIcon, LinkIcon, PlusIcon, QrCodeIcon, SaveIcon, Share2Icon } from 'lucide-vue-next';
+import { BanIcon, DownloadIcon, EditIcon, LinkIcon, PlusIcon, SaveIcon } from 'lucide-vue-next';
 import ConfirmDelete from '../components/organisms/ConfirmDelete.vue';
 import { toast } from 'vue-sonner';
 import RowSave from '../components/organisms/RowSave.vue';
@@ -20,6 +20,7 @@ import { isAxiosError } from 'axios';
 import QRShow from '../components/organisms/QRShow.vue';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import RowPeerMobile from '../components/organisms/RowPeerMobile.vue';
 
 const peers = ref<Peer[]>([])
 const showRowSave = ref(false)
@@ -46,16 +47,13 @@ async function handleDownload(peer: Peer) {
     URL.revokeObjectURL(url)
 }
 
-async function handleUpdate(peer: Peer, index: number) {
-    const validIp = /^\d+\.\d+\.\d+\.\d+$/.test(form.address)
+async function handleUpdate(peer: Peer, newData: PutPeer, index: number) {
+    const validIp = /^\d+\.\d+\.\d+\.\d+$/.test(newData.address)
     if (!validIp) {
         toast.error('Address invalid')
     }
     try {
-        const response = await putPeer(peer.slug, {
-            address: form.address,
-            name: form.name,
-        })
+        const response = await putPeer(peer.slug, newData)
         peers.value[index] = response.data.data
         toast.info(response.data.message)
         editing.value = -1
@@ -93,7 +91,12 @@ function handleSave(name: string) {
 </script>
 
 <template>
-    <ContainerCenter>
+    <div class="w-screen mt-[69px] p-8 grid md:hidden gap-4">
+        <RowPeerMobile v-for="(peer, index) in peers" :key="`${peer.slug}-rowpeermobile`" :peer="peer"
+            @download="handleDownload(peer)" @delete="handleDelete(peer, index)"
+            @update="handleUpdate(peer, $event, index)" />
+    </div>
+    <ContainerCenter class="hidden md:grid">
         <div class="min-w-200 border rounded-sm">
             <Table>
                 <TableHeader>
@@ -127,7 +130,7 @@ function handleSave(name: string) {
                                     <BanIcon />
                                     Cancelar
                                 </Button>
-                                <Button :disabled="!peer.name" @click="handleUpdate(peer, index)">
+                                <Button :disabled="!peer.name" @click="handleUpdate(peer, form, index)">
                                     <SaveIcon />
                                     Guardar
                                 </Button>

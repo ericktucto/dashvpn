@@ -83,9 +83,10 @@ class WireguardWrapper implements PeerManageInterface
             throw new Exception('Peer not found');
         }
 
-        if ($target->getSlug() !== Str::slug($name)) {
-            file_put_contents("{$this->prefix}/peers/{$slug}.pub", $target->getPublicKey());
-            file_put_contents("{$this->prefix}/peers/{$slug}.key", $target->getPrivateKey());
+        $newSlug = Str::slug($name);
+        if ($target->getSlug() !== $newSlug) {
+            file_put_contents("{$this->prefix}/peers/{$newSlug}.pub", $target->getPublicKey());
+            file_put_contents("{$this->prefix}/peers/{$newSlug}.key", $target->getPrivateKey());
             $this->removeFileOfPeer($target);
         }
 

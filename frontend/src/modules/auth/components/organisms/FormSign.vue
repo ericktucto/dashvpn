@@ -38,13 +38,8 @@ async function handleSubmit() {
 
 <template>
     <Card class="w-full max-w-sm">
-        <CardHeader class="">
+        <CardHeader class="grid justify-items-center">
             <CardTitle class="h-full row-span-2 grid items-center">Iniciar Sesion</CardTitle>
-            <CardAction>
-                <Button variant="link" class="hover:cursor-pointer">
-                    Registro
-                </Button>
-            </CardAction>
         </CardHeader>
         <CardContent>
             <form id="loginform" @submit.prevent="handleSubmit">
@@ -56,19 +51,14 @@ async function handleSubmit() {
                     <div class="flex flex-col space-y-1.5">
                         <div class="flex items-center">
                             <Label for="password">Contraseña</Label>
-                            <a href="#" class="ml-auto inline-block text-sm underline">
-                                ¿Olvidaste tu contraseña?
-                            </a>
                         </div>
                         <Input id="password" type="password" required v-model="password" />
                     </div>
+                    <Button class="w-full" form="loginform">
+                        Login
+                    </Button>
                 </div>
             </form>
         </CardContent>
-        <CardFooter class="flex flex-col gap-2">
-            <Button class="w-full" form="loginform">
-                Login
-            </Button>
-        </CardFooter>
     </Card>
 </template>
