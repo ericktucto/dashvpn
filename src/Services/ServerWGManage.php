@@ -13,7 +13,7 @@ use Noodlehaus\Config;
 use Override;
 use Psr\Container\ContainerInterface;
 
-final class ServerLocalManage implements ServerManageInterface
+final class ServerWGManage implements ServerManageInterface
 {
     protected string $prefix;
 
@@ -73,7 +73,7 @@ final class ServerLocalManage implements ServerManageInterface
     public function getServer(): ?Server
     {
         $output = [];
-        exec("cat {$this->prefix}/wg0.conf", $output);
+        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager get-config", $output);
         if (count($output) === 0) {
             return null;
         }
@@ -94,17 +94,9 @@ final class ServerLocalManage implements ServerManageInterface
      */
     public function generateKeys(): array|false
     {
-        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wg0.pub");
+        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager generate-keys");
 
-        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wg0.key");
-
-        Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wg0.psk");
-
-        return [
-            "publicKey" => (string) file_get_contents("{$this->prefix}/wg0.pub"),
-            "privateKey" => (string) file_get_contents("{$this->prefix}/wg0.key"),
-            "presharedKey" => (string) file_get_contents("{$this->prefix}/wg0.psk"),
-        ];
+        return $this->getServerKeys();
     }
 
     #[Override]
@@ -122,21 +114,13 @@ final class ServerLocalManage implements ServerManageInterface
             'privateKey' => '',
             'presharedKey' => '',
         ];
-        $keys['publicKey'] = Helper::outputFirstLine("cat {$this->prefix}/wg0.pub");
-        if ($keys['publicKey'] === false) {
-            return false;
-        }
 
-        $keys['privateKey'] = Helper::outputFirstLine("cat {$this->prefix}/wg0.key");
-        if ($keys['privateKey'] === false) {
-            return false;
+        $output = [];
+        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager get-keys", $output);
+        foreach ($output as $line) {
+            $split = explode('=', $line);
+            $keys[$split[0]] = $split[1];
         }
-
-        $psk = Helper::outputFirstLine("cat {$this->prefix}/wg0.psk");
-        if ($psk === false) {
-            return false;
-        }
-        $keys['presharedKey'] = $psk;
 
         return $keys;
     }
@@ -151,5 +135,7 @@ final class ServerLocalManage implements ServerManageInterface
         $lines = $builder->generate();
 
         file_put_contents("{$this->prefix}/wg0.conf", $lines);
+
+        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager reload");
     }
 }
