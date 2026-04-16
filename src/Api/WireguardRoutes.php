@@ -2,6 +2,7 @@
 
 namespace App\Api;
 
+use App\Api\SharedLink\CreateController;
 use App\Api\Wireguard\PeerController;
 use App\Api\Wireguard\ServerController;
 use League\Route\RouteGroup;
@@ -21,6 +22,7 @@ final class WireguardRoutes extends Route
         $group->post('/peers', [PeerController::class, 'store']);
         $group->put('/peers/{slug}', [PeerController::class, 'update']);
         $group->delete('/peers/{slug}', [PeerController::class, 'destroy']);
+        $group->get('/peers/{slug}/share', [CreateController::class, 'index']);
         $group->get('/peers/{slug}/config', [PeerController::class, 'config']);
     }
 }

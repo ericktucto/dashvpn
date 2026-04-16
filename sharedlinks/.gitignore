@@ -476,8 +476,8 @@ composer.lock
 *.scss.map
 /clockwork/
 /config.yml
-/app.db
+/sharedlinks.db
 /.phpunit.cache/
 /wireguard/
-/private.pem
 /public.pem
+/private.pem

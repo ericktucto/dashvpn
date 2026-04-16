@@ -3,12 +3,14 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, 
 import { type Peer, type PutPeer } from '../../services/fetch';
 import { reactive, ref } from 'vue';
 import { Button } from '@/components/ui/button';
-import { DownloadIcon, EditIcon, LinkIcon } from 'lucide-vue-next';
+import { BanIcon, EditIcon, SaveIcon } from 'lucide-vue-next';
 import QRShow from './QRShow.vue';
 import ConfirmDelete from './ConfirmDelete.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import ShareLink from './ShareLink.vue';
+import DownloadPeerConf from '../../molecules/DownloadPeerConf.vue';
 
 defineProps<{
     peer: Peer
@@ -16,7 +18,6 @@ defineProps<{
 
 defineEmits<{
     delete: []
-    download: []
     update: [form: PutPeer]
 }>()
 
@@ -62,14 +63,10 @@ function handleEdit(peer: Peer) {
                 <Button variant="secondary" @click="handleEdit(peer)">
                     <EditIcon />
                 </Button>
-                <Button variant="outline" @click="$emit('download')">
-                    <DownloadIcon />
-                </Button>
-                <Button variant="outline">
-                    <LinkIcon />
-                </Button>
+                <DownloadPeerConf :peer="peer" />
+                <ShareLink :peer="peer" />
                 <QRShow :peer="peer" />
-                <ConfirmDelete :peer="peer" @confirm="$emit('delete')" />
+                <ConfirmDelete :peer="peer" @deleted="$emit('delete')" />
             </div>
         </CardFooter>
     </Card>

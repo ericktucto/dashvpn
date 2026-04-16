@@ -75,8 +75,9 @@ final class ServerLocalManage implements ServerManageInterface
     #[Override]
     public function getServer(): ?Server
     {
-        $result = (bool) exec("cat {$this->prefix}/wg0.conf", $output);
-        if (!$result) {
+        $output = [];
+        exec("cat {$this->prefix}/wg0.conf", $output);
+        if (count($output) === 0) {
             return null;
         }
         $keys = $this->getServerKeys();
@@ -103,9 +104,9 @@ final class ServerLocalManage implements ServerManageInterface
         Helper::outputFirstLine("openssl rand -base64 32 > {$this->prefix}/wg0.psk");
 
         return [
-            "publicKey" => (string) file_get_contents("{$this->prefix}/wireguard/wg0.pub"),
-            "privateKey" => (string) file_get_contents("{$this->prefix}/wireguard/wg0.key"),
-            "presharedKey" => (string) file_get_contents("{$this->prefix}/wireguard/wg0.psk"),
+            "publicKey" => (string) file_get_contents("{$this->prefix}/wg0.pub"),
+            "privateKey" => (string) file_get_contents("{$this->prefix}/wg0.key"),
+            "presharedKey" => (string) file_get_contents("{$this->prefix}/wg0.psk"),
         ];
     }
 

@@ -11,19 +11,26 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { TrashIcon } from 'lucide-vue-next';
-import type { Peer } from '../../services/fetch';
+import { deletePeer, type Peer } from '../../services/fetch';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 defineProps<{
     peer: Peer
 }>()
 
-defineEmits<{
-    confirm: []
+const emit = defineEmits<{
+    deleted: [peer: Peer]
 }>()
 
 const nombre = ref('')
 
+function handleDelete(peer: Peer) {
+    deletePeer(peer.slug).then(res => {
+        toast.info(res.data.message)
+        emit('deleted', peer)
+    })
+}
 </script>
 
 <template>
@@ -40,7 +47,7 @@ const nombre = ref('')
                 </DialogHeader>
                 <div class="grid gap-4">
                     <p>Esta acción es permanente, para confirmar, escribe el nombre del peer <strong>({{ peer.name
-                    }})</strong></p>
+                            }})</strong></p>
                     <Input name="name" placeholder="Escribe el nombre del peer" v-model="nombre" />
                 </div>
                 <DialogFooter>
@@ -51,8 +58,9 @@ const nombre = ref('')
                             </Button>
                         </DialogClose>
                         <DialogClose as-child>
-                            <Button type="submit" :disabled="nombre != peer.name" @click="$emit('confirm')">
-                                Save changes
+                            <Button type="submit" variant="destructive" :disabled="nombre != peer.name"
+                                @click="handleDelete(peer)">
+                                Delete
                             </Button>
                         </DialogClose>
                     </div>

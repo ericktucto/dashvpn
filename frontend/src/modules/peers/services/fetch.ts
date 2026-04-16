@@ -59,3 +59,14 @@ export function getNextAddress() {
         AxiosResponse<{ data: { address: string } }>
     >('/api/wireguard/peers/next-address')
 }
+
+export interface GetLink {
+    url: string;
+    otp: string;
+}
+export function getLink(slug: string) {
+    return axios.get<
+        {},
+        AxiosResponse<{ data: GetLink }>
+    >(`/api/wireguard/peers/${slug}/share`)
+}

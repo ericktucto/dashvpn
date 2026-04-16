@@ -1,0 +1,42 @@
+* {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.grid {
+    display: grid;
+}
+.w-screen {
+    width: 100dvw;
+}
+.h-screen {
+    height: 100dvh;
+}
+.justify-items-center {
+    justify-items: center;
+}
+.items-center {
+    align-items: center;
+}
+#app {
+    justify-content: center;
+    align-content: center;
+    overflow: hidden;
+}
+svg {
+    width: 5rem;
+    height: 5rem;
+}
+svg path {
+    fill: #e11d48;
+}
+h3 {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+}

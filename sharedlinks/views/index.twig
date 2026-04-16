@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="grid justify-items-center items-center w-screen h-screen">
+        <form id="formotp" class="hidden" method="POST">
+            {% if error %}
+            <div id="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+            <h3>Introduce el código</h3>
+            <label id="codelabel">
+                <span id="showcode">
+                    {% verbatim %}
+                    <span :class="[code.length == 0 ? 'active' : '']">{{ first }}</span>
+                    <span :class="[code.length == 1 ? 'active' : '']">{{ second }}</span>
+                    <span :class="[code.length == 2 ? 'active' : '']">{{ third }}</span>
+                    <span :class="[code.length == 3 ? 'active' : '']">{{ fourth }}</span>
+                    <span :class="[code.length == 4 ? 'active' : '']">{{ fifth }}</span>
+                    <span :class="[code.length > 4 ? 'active' : '']">{{ sixth }}</span>
+                    {% endverbatim %}
+                </span>
+                <input :value="code" @keydown="onlyNumbers" autocomplete="off" name="otp" @input="handleInput" inputmode="numeric" id="inputcode" type="text" maxlength="6" required>
+            </label>
+            <button type="submit" class="btn w-full grid items-center">CONFIRMAR</button>
+        </form>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
+

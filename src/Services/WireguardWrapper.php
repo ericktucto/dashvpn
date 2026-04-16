@@ -46,6 +46,10 @@ class WireguardWrapper implements PeerManageInterface
 
     public function createServer(Ip $address, int $listenPort): Server
     {
+        $peers = $this->getPeers();
+        if (is_array($peers)) {
+            array_map(fn (Peer $peer) => $this->removeFileOfPeer($peer), $peers);
+        }
         return $this->manager->createServer($address, $listenPort);
     }
 

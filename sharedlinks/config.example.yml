@@ -5,9 +5,7 @@ databases:
   default: sqlite
   sqlite:
     driver: sqlite
-    path: ../app.db
-shared_api: http://localhost:8383
-private_key: /home/ubuntu/dashvpn/private.pem
+    path: ../sharedlinks.db
 cors:
   origins: ['*']
   methods: ['GET', 'POST', 'PUT', 'DELETE']
@@ -19,6 +17,6 @@ jwt:
   key: example
   expires: 3600
 data:
-  config_dir: '/home/ubuntu/.config/wireguard'
+  config_dir: '/home/ubunutu/.config/wireguard'
   ip: 127.0.0.1
   dns: 1.1.1.1

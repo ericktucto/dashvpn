@@ -1,0 +1,82 @@
+* {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+.flex {
+    display: flex;
+}
+.grid {
+    display: grid;
+}
+.text-center {
+    text-align: center;
+}
+.w-full {
+    width: 100%;
+}
+.w-screen {
+    width: 100dvw;
+}
+.h-screen {
+    height: 100dvh;
+}
+.justify-center {
+    justify-content: center;
+}
+.justify-items-center {
+    justify-items: center;
+}
+.items-center {
+    align-items: center;
+}
+#formotp {
+    padding-bottom: 64px;
+}
+.btn {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  background-color: #488aec;
+  color: #ffffff;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  user-select: none;
+  gap: 0.75rem;
+  box-shadow:
+    0 4px 6px -1px #488aec31,
+    0 2px 4px -1px #488aec17;
+  transition: all 0.6s ease;
+}
+
+.btn:hover {
+  box-shadow:
+    0 10px 15px -3px #488aec4f,
+    0 4px 6px -2px #488aec17;
+}
+
+.btn:focus,
+.btn:active {
+  opacity: 0.85;
+  box-shadow: none;
+}
+
+.btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.btn svg path {
+  fill: #ffffff;
+}
+

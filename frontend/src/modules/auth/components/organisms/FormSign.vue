@@ -3,9 +3,7 @@ import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import {
     Card,
-    CardAction,
     CardContent,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
