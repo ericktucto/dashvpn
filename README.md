@@ -25,7 +25,8 @@ Existen varias tareas y puedes encontrarlas en el archivo `TODO.md`.
 1. Clonar el repositorio: `git clone https://github.com/ericktucto/dashvpn.git`
 2. Levantar el servidor web: En la raíz del proyecto, ejecutar `composer install`,
 luego configura tu servidor web, por ejemplo con nginx (recuerda apuntar a
-`public` en lugar de `src`). No expongas el puerto, que viva en localhost
+`public` en lugar de `src`). No expongas el puerto, que viva en localhost, para
+mas detalles mira `BUILD.md`
 3. Levantar frontend: Entra a la carpeta `frontend` y ejecuta `npm ci` y luego
 ejecuta `npm run build`, luego configura tu servidor web, por ejemplo con nginx
 (recuerda apuntar a `dist` en lugar de `src`). No expongas el puerto, que viva en
@@ -33,7 +34,11 @@ localhost.
 4. Web público: Entra a la carpeta `sharedlinks` y ejecuta `composer install` y
 luego configura tu servidor web, por ejemplo con nginx (recuerda apuntar a
 `public` en lugar de `src`). Este debe ser público, para que puedan compartir los
-peers que crees
+peers que crees. Para mas detalles mira `sharedlinks/BUILD.md`
+5. Debes agregar pasar el script `wg-manager.sh` como si binario con el siguiente
+comando `sudo cp wg-manager.sh /usr/local/bin/wg-manager`, y debe permitir al usuario
+`www-data` ejecutar el binario con sudo sin la necesidad de ingresar contraseñas.
+Usa `visudo` y agrega `www-data ALL=(ALL) NOPASSWD: /usr/local/bin/wg-manager`
 
 ## ¿Como contribuir al proyecto?
 
