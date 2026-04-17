@@ -1,3 +1,4 @@
+- [ ] Agregar algun worker o vigilante que monitoreo los links vendidos y los elimine (sharedlinks)
 - [ ] Al crear un Peer debe ser posible elegir el address que se desee
 - [ ] Permitir desactivar peers
 - [ ] Colocar la definicion del servidor en base de datos, dejando la creacion el archivo como abstracto
