@@ -9,7 +9,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { getNextAddress, postPeer, type Peer } from '../../services/fetch';
 import { PlusIcon } from 'lucide-vue-next';
@@ -25,11 +24,11 @@ const emit = defineEmits<{
     save: [newPeer: Peer]
 }>()
 
-onMounted(() => {
+function handleOpen() {
     getNextAddress().then((res) => {
         nextIp.value = res.data.data.address
     })
-})
+}
 function handleSave(name: string, close: () => void) {
     postPeer(name).then(res => {
         emit('save', res.data.data)
@@ -47,7 +46,7 @@ function handleSave(name: string, close: () => void) {
     <Dialog v-slot="{ close }">
         <form>
             <DialogTrigger as-child>
-                <Button class="fixed bottom-4 right-4 size-12">
+                <Button class="fixed bottom-4 right-4 size-12" @click="handleOpen">
                     <PlusIcon class="size-6" />
                 </Button>
             </DialogTrigger>
