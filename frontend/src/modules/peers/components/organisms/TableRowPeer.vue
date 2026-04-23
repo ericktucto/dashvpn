@@ -10,6 +10,7 @@ import { BanIcon, EditIcon, SaveIcon } from 'lucide-vue-next';
 import QRShow from './QRShow.vue';
 import ConfirmDelete from './ConfirmDelete.vue';
 import ShareLink from './ShareLink.vue';
+import { handleUpdate } from '../../composables/useUpdatePeer';
 
 const editing = ref(false)
 const form = reactive({
@@ -21,14 +22,21 @@ defineProps<{
     peer: Peer,
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
     delete: []
-    update: [form: PutPeer]
+    updated: [form: Peer]
 }>()
 function handleEdit(peer: Peer) {
     editing.value = true
     form.name = peer.name
     form.address = peer.address
+}
+async function onUpdatePeer(peer: Peer) {
+    const res = await handleUpdate(peer, form)
+    if (res !== null) {
+        editing.value = false
+        emit('updated', res)
+    }
 }
 </script>
 <template>
@@ -50,7 +58,7 @@ function handleEdit(peer: Peer) {
                     <BanIcon />
                     Cancelar
                 </Button>
-                <Button :disabled="!peer.name" @click="$emit('update', form)">
+                <Button :disabled="!peer.name" @click="onUpdatePeer(peer)">
                     <SaveIcon />
                     Actualizar
                 </Button>

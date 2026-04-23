@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardAction } from '@/components/ui/card';
-import { type Peer, type PutPeer } from '../../services/fetch';
+import { type Peer } from '../../services/fetch';
 import { reactive, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { BanIcon, EditIcon, SaveIcon } from 'lucide-vue-next';
@@ -11,14 +11,15 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import ShareLink from './ShareLink.vue';
 import DownloadPeerConf from '../../molecules/DownloadPeerConf.vue';
+import { handleUpdate } from '../../composables/useUpdatePeer';
 
 defineProps<{
     peer: Peer
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
     delete: []
-    update: [form: PutPeer]
+    updated: [form: Peer]
 }>()
 
 const editing = ref(false)
@@ -31,6 +32,13 @@ function handleEdit(peer: Peer) {
     editing.value = true
     form.name = peer.name
     form.address = peer.address
+}
+async function onUpdatePeer(peer: Peer) {
+    const res = await handleUpdate(peer, form)
+    if (res !== null) {
+        editing.value = false
+        emit('updated', res)
+    }
 }
 </script>
 <template>
@@ -54,7 +62,7 @@ function handleEdit(peer: Peer) {
                     <BanIcon />
                     Cancelar
                 </Button>
-                <Button :disabled="!peer.name" @click="$emit('update', form)">
+                <Button :disabled="!peer.name" @click="onUpdatePeer(peer)">
                     <SaveIcon />
                     Guardar
                 </Button>

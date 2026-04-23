@@ -19,13 +19,15 @@ const emit = defineEmits<{
 }>()
 
 function handleShow() {
+    name.value = ''
     show.value = true
     getNextAddress().then((res) => {
         nextIp.value = res.data.data.address
     })
 }
 function handleSave(name: string) {
-    postPeer(name).then(res => {
+    postPeer(name).then(async (res) => {
+        handleShow()
         emit('save', res.data.data)
     }).catch(error => {
         if (isAxiosError(error) && error.response) {
