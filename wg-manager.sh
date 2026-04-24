@@ -6,6 +6,7 @@ WG_INTERFACE="wg0"
 WG_DIR="/etc/wireguard"
 
 COMMAND="${1:-}"
+PREFIX_DIR="${2:-}"
 
 function get_keys() {
     echo "publicKey=$(cat ${WG_DIR}/${WG_INTERFACE}.pub)"

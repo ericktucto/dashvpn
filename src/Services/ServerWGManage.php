@@ -73,7 +73,7 @@ final class ServerWGManage implements ServerManageInterface
      */
     public function generateKeys(): array|false
     {
-        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager generate-keys");
+        exec("sudo /usr/local/bin/wg-manager generate-keys '{$this->prefix}'");
 
         return $this->getServerKeys();
     }
@@ -95,7 +95,7 @@ final class ServerWGManage implements ServerManageInterface
         ];
 
         $output = [];
-        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager get-keys", $output);
+        exec("sudo /usr/local/bin/wg-manager get-keys '{$this->prefix}'", $output);
         foreach ($output as $line) {
             $split = explode('=', $line);
             $keys[$split[0]] = $split[1];
@@ -115,6 +115,6 @@ final class ServerWGManage implements ServerManageInterface
 
         file_put_contents("{$this->prefix}/wg0.conf", $lines);
 
-        exec("sudo PREFIX_DIR='{$this->prefix}' /usr/local/bin/wg-manager reload");
+        exec("sudo /usr/local/bin/wg-manager reload '{$this->prefix}'");
     }
 }
