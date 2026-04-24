@@ -23,8 +23,14 @@ final class ServerController
      */
     public function index(): ResponseInterface
     {
+        $server = $this->service->server();
+        if ($server === null) {
+            return Response::json([
+                'message' => 'Server not found',
+            ], 422);
+        }
         return Response::json([
-            'data' => $this->service->server()->toArray(),
+            'data' => $server->toArray(),
         ]);
     }
 
@@ -38,8 +44,10 @@ final class ServerController
 
         return Response::json([
             'data' => $this->service->createServer(
-                new Ip($json->address),
+                new Ip($json->ip),
                 (int) $json->listen_port,
+                new Ip($json->address),
+                new Ip($json->dns),
             )->toArray(),
         ]);
     }

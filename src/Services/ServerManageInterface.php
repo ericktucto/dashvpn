@@ -7,11 +7,11 @@ use App\Domain\Wireguard\Server;
 
 interface ServerManageInterface
 {
-    public function getServer(): ?Server;
-
     public function createServer(
-        Ip $address,
+        Ip $ip,
         int $listenPort,
+        Ip $address,
+        Ip $dns,
     ): Server;
 
 

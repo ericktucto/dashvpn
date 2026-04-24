@@ -12,10 +12,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { TrashIcon } from 'lucide-vue-next';
 import { deletePeer, type Peer } from '../../services/fetch';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { useCrudStore } from '../../stores/crud';
 
-defineProps<{
+const crudStore = useCrudStore()
+
+const props = defineProps<{
     peer: Peer
 }>()
 
@@ -31,17 +34,27 @@ function handleDelete(peer: Peer) {
         emit('deleted', peer)
     })
 }
+
+const disabled = computed(() => {
+    if (crudStore.updating || crudStore.adding) {
+        return true
+    }
+    return false
+})
+function handleClose() {
+    crudStore.removeProcess("deleting")
+}
 </script>
 
 <template>
     <Dialog>
         <form>
             <DialogTrigger as-child>
-                <Button variant="destructive">
+                <Button variant="destructive" @click="crudStore.addProcess('deleting', peer.slug)" :disabled="disabled">
                     <TrashIcon />
                 </Button>
             </DialogTrigger>
-            <DialogContent class="sm:max-w-[425px]">
+            <DialogContent class="sm:max-w-[425px]" @close-auto-focus="handleClose">
                 <DialogHeader>
                     <DialogTitle>Eliminar Peer</DialogTitle>
                 </DialogHeader>

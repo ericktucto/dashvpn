@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Adapters\Wireguard\FileToPeer;
-use App\Adapters\Wireguard\FileToServer;
 use App\Builders\PeerConfig;
 use App\Builders\ServerConfig;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Peer;
 use App\Domain\Wireguard\Server;
 use App\Helper;
+use App\Models\Server as AppServer;
 use DI\Attribute\Inject;
 use Exception;
 use Illuminate\Support\Str;
@@ -41,16 +41,35 @@ class WireguardWrapper implements PeerManageInterface
 
     public function getServer(): ?Server
     {
-        return $this->manager->getServer();
+        /** @var ?AppServer $server */
+        $server = $this->container->get(AppServer::class);
+        if ($server === null) {
+            return null;
+        }
+        $keys = $this->manager->getServerKeys();
+        if ($keys === false) {
+            throw new Exception('No keys');
+        }
+        return new Server(
+            $server->address,
+            $server->ip,
+            $server->listenPort,
+            $server->dns,
+        );
     }
 
-    public function createServer(Ip $address, int $listenPort): Server
+    public function createServer(AppServer $server): Server
     {
         $peers = $this->getPeers();
         if (is_array($peers)) {
             array_map(fn (Peer $peer) => $this->removeFileOfPeer($peer), $peers);
         }
-        return $this->manager->createServer($address, $listenPort);
+        return $this->manager->createServer(
+            new Ip($server->ip),
+            $server->listenPort,
+            new Ip($server->address),
+            new Ip($server->dns),
+        );
     }
 
     public function getConfigPeer(string $slug): string|false
@@ -59,10 +78,12 @@ class WireguardWrapper implements PeerManageInterface
     }
 
     public function updatePeer(
-        string $slug,
+        string $searchBySlug,
         string $name,
         Ip $address,
     ): Peer {
+        $newSlug = Str::slug($name);
+
         $server = $this->getServer();
         if ($server === null) {
             throw new Exception('Server not found');
@@ -75,7 +96,10 @@ class WireguardWrapper implements PeerManageInterface
         $target = null;
         $currentKey = 0;
         foreach ($peers as $key => $peer) {
-            if ($peer->getAddress() === $address->getValue() && $peer->getSlug() !== $slug) {
+            if (
+                $peer->getAddress() === $address->getValue() && $peer->getSlug() !== $slug
+            ) {
+                dd($peer, $slug);
                 throw new Exception('Ip already used');
             }
             if ($peer->getSlug() === $slug) {
@@ -87,7 +111,6 @@ class WireguardWrapper implements PeerManageInterface
             throw new Exception('Peer not found');
         }
 
-        $newSlug = Str::slug($name);
         if ($target->getSlug() !== $newSlug) {
             file_put_contents("{$this->prefix}/peers/{$newSlug}.pub", $target->getPublicKey());
             file_put_contents("{$this->prefix}/peers/{$newSlug}.key", $target->getPrivateKey());
@@ -184,7 +207,7 @@ class WireguardWrapper implements PeerManageInterface
 
         $peers = $this->getPeers();
 
-        if ($peers === false) {
+        if ($peers === false || count($peers) === 0) {
             $newIp = preg_replace("/([0-9]+)$/", "2", $address);
             return is_string($newIp) ? new Ip(
                 $newIp
@@ -214,12 +237,14 @@ class WireguardWrapper implements PeerManageInterface
             }
             $i++;
         }
+
         $number = ip2long($address);
+
         if ($number === false) {
             throw new Exception('Invalid ip');
         }
         return new Ip(
-            long2ip($number + 1)
+            long2ip($number + count($numbers) + 1)
         );
     }
 }

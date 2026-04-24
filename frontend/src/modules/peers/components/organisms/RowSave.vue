@@ -4,14 +4,26 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { BanIcon, PlusIcon, SaveIcon } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { getNextAddress, postPeer, type Peer } from '../../services/fetch';
 import { isAxiosError } from 'axios';
 import { toast } from 'vue-sonner';
+import { useCrudStore } from '../../stores/crud';
+
+const crudStore = useCrudStore()
+
+const uuid = crypto.randomUUID()
+
+const show = computed(() => crudStore.adding == uuid)
+const disabled = computed(() => {
+    if (crudStore.updating) {
+        return true
+    }
+    return false
+})
 
 const name = ref('')
 const nextIp = ref('')
-const show = ref(false)
 
 const emit = defineEmits<{
     cancel: []
@@ -20,7 +32,7 @@ const emit = defineEmits<{
 
 function handleShow() {
     name.value = ''
-    show.value = true
+    crudStore.addProcess('adding', uuid)
     getNextAddress().then((res) => {
         nextIp.value = res.data.data.address
     })
@@ -50,12 +62,12 @@ function handleSave(name: string) {
             <Switch v-show="show" :modelValue="true" />
         </TableCell>
         <TableCell class="text-right pr-8">
-            <Button @click="handleShow" v-show="!show">
+            <Button @click="handleShow" v-show="!show" :disabled="disabled">
                 <PlusIcon />
                 Agregar Peer
             </Button>
             <div class="justify-end gap-6" :class="[show ? 'flex' : 'hidden']">
-                <Button variant="outline" @click="show = false">
+                <Button variant="outline" @click="crudStore.removeProcess('adding')">
                     <BanIcon />
                     Cancelar
                 </Button>

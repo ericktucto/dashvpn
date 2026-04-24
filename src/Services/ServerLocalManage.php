@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Adapters\Wireguard\FileToServer;
 use App\Builders\ServerConfig;
 use App\Domain\Wireguard\Ip;
 use App\Domain\Wireguard\Server;
@@ -18,7 +17,6 @@ final class ServerLocalManage implements ServerManageInterface
     protected string $prefix;
 
     public function __construct(
-        protected FileToServer $adapterServer,
         protected ContainerInterface $container,
     ) {
         $this->prefix = $this->getConfigData('data.config_dir');
@@ -37,15 +35,11 @@ final class ServerLocalManage implements ServerManageInterface
 
     #[Override]
     public function createServer(
-        Ip $address,
+        Ip $ip,
         int $listenPort,
+        Ip $address,
+        Ip $dns,
     ): Server {
-        $ip = new Ip(
-            $this->getConfigData('data.ip'),
-        );
-        $dns = new Ip(
-            $this->getConfigData('data.dns'),
-        );
         $server = new Server(
             $address->getValue(),
             $ip->getValue(),
@@ -67,21 +61,6 @@ final class ServerLocalManage implements ServerManageInterface
         $this->reloadFileConfig($server, []);
 
         return $server;
-    }
-
-    #[Override]
-    public function getServer(): ?Server
-    {
-        $output = [];
-        exec("cat {$this->prefix}/wg0.conf", $output);
-        if (count($output) === 0) {
-            return null;
-        }
-        $keys = $this->getServerKeys();
-        if ($keys === false) {
-            throw new Exception('No keys');
-        }
-        return $this->adapterServer->parse($keys, $output);
     }
 
     #[Override]

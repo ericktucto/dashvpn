@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import type { Peer, PutPeer } from '../../services/fetch';
+import { computed, reactive } from 'vue';
+import type { Peer } from '../../services/fetch';
 import DownloadPeerConf from '../../molecules/DownloadPeerConf.vue';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -11,14 +11,27 @@ import QRShow from './QRShow.vue';
 import ConfirmDelete from './ConfirmDelete.vue';
 import ShareLink from './ShareLink.vue';
 import { handleUpdate } from '../../composables/useUpdatePeer';
+import { useCrudStore } from '../../stores/crud';
 
-const editing = ref(false)
+const crudStore = useCrudStore()
+
+const editing = computed(() => crudStore.updating == props.peer.slug)
+const disabled = computed(() => {
+    if (crudStore.adding) {
+        return true
+    }
+    if (crudStore.updating && crudStore.updating != props.peer.slug) {
+        return true
+    }
+    return false
+})
+
 const form = reactive({
     name: '',
     address: '',
 })
 
-defineProps<{
+const props = defineProps<{
     peer: Peer,
 }>()
 
@@ -27,14 +40,14 @@ const emit = defineEmits<{
     updated: [form: Peer]
 }>()
 function handleEdit(peer: Peer) {
-    editing.value = true
+    crudStore.addProcess('updating', peer.slug)
     form.name = peer.name
     form.address = peer.address
 }
 async function onUpdatePeer(peer: Peer) {
     const res = await handleUpdate(peer, form)
     if (res !== null) {
-        editing.value = false
+        crudStore.removeProcess('updating')
         emit('updated', res)
     }
 }
@@ -54,7 +67,7 @@ async function onUpdatePeer(peer: Peer) {
         </TableCell>
         <TableCell class="text-right pr-8">
             <div :class="[editing ? 'flex' : 'hidden']" class="justify-end gap-6">
-                <Button variant="outline" @click="editing = false">
+                <Button variant="outline" @click="crudStore.removeProcess('updating')">
                     <BanIcon />
                     Cancelar
                 </Button>
@@ -64,7 +77,7 @@ async function onUpdatePeer(peer: Peer) {
                 </Button>
             </div>
             <div :class="[!editing ? 'inline-flex' : 'hidden']" class="gap-2">
-                <Button variant="secondary" @click="handleEdit(peer)">
+                <Button variant="secondary" @click="handleEdit(peer)" :disabled="disabled">
                     <EditIcon />
                 </Button>
                 <DownloadPeerConf :peer="peer" />

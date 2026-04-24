@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table'
 import ContainerCenter from '@/layouts/ContainerCenter.vue';
 import { onMounted, ref } from 'vue';
-import { deletePeer, getPeers, putPeer, type Peer, type PutPeer } from '../services/fetch';
+import { deletePeer, getPeers, type Peer } from '../services/fetch';
 import { toast } from 'vue-sonner';
 import RowSave from '../components/organisms/RowSave.vue';
 import { isAxiosError } from 'axios';
@@ -70,7 +70,7 @@ function handleSave(peer: Peer) {
 <template>
     <div class="w-screen mt-[69px] p-8 grid md:hidden gap-4 mb-16">
         <RowPeerMobile v-for="(peer, index) in peers" :key="`${peer.slug}-rowpeermobile`" :peer="peer"
-            @delete="handleDelete(peer, index)" @update="handleUpdate(peer, $event, index)" />
+            @delete="handleDelete(peer, index)" @update="handleUpdate(peer, $event)" />
         <DialogSave @save="handleSave" />
     </div>
     <ContainerCenter class="hidden md:grid">
