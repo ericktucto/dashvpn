@@ -97,8 +97,8 @@ final class ServerWGManage implements ServerManageInterface
         $output = [];
         exec("sudo /usr/local/bin/wg-manager get-keys '{$this->prefix}'", $output);
         foreach ($output as $line) {
-            $split = explode('=', $line);
-            $keys[$split[0]] = $split[1];
+            [$key, $value] = explode('=', $line, 2);
+            $keys[$key] = trim($value);
         }
 
         return $keys;

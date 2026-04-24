@@ -9,10 +9,11 @@ import { getNextAddress, postPeer, type Peer } from '../../services/fetch';
 import { isAxiosError } from 'axios';
 import { toast } from 'vue-sonner';
 import { useCrudStore } from '../../stores/crud';
+import { v4 as uuidv4 } from 'uuid';
 
 const crudStore = useCrudStore()
 
-const uuid = crypto.randomUUID()
+const uuid = uuidv4()
 
 const show = computed(() => crudStore.adding == uuid)
 const disabled = computed(() => {
