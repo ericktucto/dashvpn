@@ -43,7 +43,7 @@ trait HasPeerManage
             return false;
         }
 
-        $psk = file_get_contents("{$this->prefix}/wg0.key");
+        $psk = file_get_contents("{$this->prefix}/wg0.psk");
         if ($psk === false) {
             return false;
         }
@@ -65,7 +65,7 @@ trait HasPeerManage
             return false;
         }
 
-        $psk = file_get_contents("{$this->prefix}/wg0.key");
+        $psk = file_get_contents("{$this->prefix}/wg0.psk");
         if ($psk === false) {
             return false;
         }
