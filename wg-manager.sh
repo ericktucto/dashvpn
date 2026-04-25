@@ -16,8 +16,14 @@ function get_keys() {
 
 function generate_keys() {
     umask 077
+
     wg genkey | tee ${WG_DIR}/${WG_INTERFACE}.key | wg pubkey > ${WG_DIR}/${WG_INTERFACE}.pub
-    wg genpsk > ${PREFIX_DIR}/${WG_INTERFACE}.psk
+
+    chmod 600 ${WG_DIR}/${WG_INTERFACE}.key
+    chmod 644 ${WG_DIR}/${WG_INTERFACE}.pub
+
+    WEB_GROUP="$(stat -c '%G' "$PREFIX_DIR")"
+    wg genpsk | install -o root -g "$WEB_GROUP" -m 640 /dev/stdin "${PREFIX_DIR}/${WG_INTERFACE}.psk"
 
     get_keys
 }
