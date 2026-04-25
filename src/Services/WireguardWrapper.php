@@ -50,19 +50,25 @@ class WireguardWrapper implements PeerManageInterface
         if ($keys === false) {
             throw new Exception('No keys');
         }
-        return new Server(
+        $server = new Server(
             $server->address,
             $server->ip,
             $server->listenPort,
             $server->dns,
         );
+        $server->setKeys(
+            $keys['publicKey'],
+            $keys['privateKey'],
+            $keys['presharedKey'],
+        );
+        return $server;
     }
 
     public function createServer(AppServer $server): Server
     {
         $peers = $this->getPeers();
         if (is_array($peers)) {
-            array_map(fn (Peer $peer) => $this->removeFileOfPeer($peer), $peers);
+            array_map(fn(Peer $peer) => $this->removeFileOfPeer($peer), $peers);
         }
         return $this->manager->createServer(
             new Ip($server->ip),
