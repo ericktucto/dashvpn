@@ -109,11 +109,11 @@ class WireguardWrapper implements PeerManageInterface
         $currentKey = 0;
         foreach ($peers as $key => $peer) {
             if (
-                $peer->getAddress() === $address->getValue() && $peer->getSlug() !== $newSlug
+                $peer->getAddress() === $address->getValue() && $peer->getSlug() !== $searchBySlug
             ) {
                 throw new Exception('Ip already used');
             }
-            if ($peer->getSlug() === $newSlug) {
+            if ($peer->getSlug() === $searchBySlug) {
                 $target = $peer;
                 $currentKey = $key;
             }

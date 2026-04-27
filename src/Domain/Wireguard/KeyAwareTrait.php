@@ -10,9 +10,9 @@ trait KeyAwareTrait
 
     public function setKeys(string $publicKey, string $privateKey, string $preSharedKey = ''): void
     {
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-        $this->preSharedKey = $preSharedKey;
+        $this->publicKey = trim($publicKey);
+        $this->privateKey = trim($privateKey);
+        $this->preSharedKey = trim($preSharedKey);
     }
 
     public function getPublicKey(): string

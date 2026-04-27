@@ -16,6 +16,7 @@ final class Peer implements KeyAwareInterface, VPNAddressInterface
         protected string $privateKey,
         protected string $preSharedKey = '',
     ) {
+        $this->setKeys($publicKey, $privateKey, $preSharedKey);
     }
 
     public function getName(): string
