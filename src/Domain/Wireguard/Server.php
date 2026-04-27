@@ -37,9 +37,17 @@ final class Server implements KeyAwareInterface, VPNAddressInterface
             $result[] = strtr($trimmed, [
                 '%interface%' => $this->getInterface(),
                 '%address%' => $this->getAddress(),
+                '%net%' => $this->getNet(),
             ]);
         }
         return join('; ', $result);
+    }
+
+    public function getNet(): string
+    {
+        $parts = explode('.', $this->getAddress());
+        $parts[3] = '0';
+        return implode('.', $parts);
     }
 
     public function getPostUpParsed(): string
