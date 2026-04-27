@@ -7,6 +7,9 @@ export interface Server {
     port: number;
     dns: string;
     public_key: string;
+    post_up: string[];
+    post_down: string[];
+    'interface': string
 }
 
 export function getServer() {

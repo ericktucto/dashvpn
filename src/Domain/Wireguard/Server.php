@@ -92,6 +92,9 @@ final class Server implements KeyAwareInterface, VPNAddressInterface
             'port' => $this->listenPort,
             'dns' => $this->dns,
             'public_key' => $this->publicKey,
+            'post_up' => $this->postUp,
+            'post_down' => $this->postDown,
+            'interface' => $this->interface,
         ];
     }
 }

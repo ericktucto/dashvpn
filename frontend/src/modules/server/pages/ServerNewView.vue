@@ -12,6 +12,7 @@ onMounted(() => {
         const data = response.data.data
         if (form.value) {
             form.value.setConfig({
+                ip: str2Ip('0.0.0.0'),
                 address: str2Ip(data.address),
                 listen_port: data.listen_port,
                 dns: str2Ip(data.dns),

@@ -74,6 +74,7 @@ const ip: Ref<Ip> = ref({
 })
 
 type ConfigData = {
+    ip: Ip
     address: Ip
     listen_port: number
     dns: Ip
@@ -82,6 +83,7 @@ type ConfigData = {
     'interface': string
 }
 function setConfig(data: ConfigData) {
+    ip.value = data.ip
     address.value = data.address
     listen_port.value = data.listen_port
     dns.value = data.dns

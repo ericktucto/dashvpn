@@ -1,5 +1,6 @@
 CREATE TABLE server
 (
+    id         INTEGER PRIMARY KEY,
     ip         TEXT    NOT NULL,
     listenPort INTEGER NOT NULL,
     address    TEXT    NOT NULL,

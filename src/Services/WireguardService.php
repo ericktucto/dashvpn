@@ -48,19 +48,16 @@ final class WireguardService
         array $postDown,
         string $interface,
     ): Server {
-        /** @var ?AppServer */
-        $server = AppServer::query()->first();
-        if ($server === null) {
-            $server = new AppServer();
-            $server->ip = $ip->getValue();
-            $server->listenPort = $listenPort;
-            $server->address = $address->getValue();
-            $server->dns = $dns->getValue();
-            $server->interface = $interface;
-            $server->postUp = join('; ', $postUp);
-            $server->postDown = join('; ', $postDown);
-            $server->save();
-        }
+        /** @var AppServer */
+        $server = AppServer::query()->firstOrNew();
+        $server->ip = $ip->getValue();
+        $server->listenPort = $listenPort;
+        $server->address = $address->getValue();
+        $server->dns = $dns->getValue();
+        $server->interface = $interface;
+        $server->postUp = join('; ', $postUp);
+        $server->postDown = join('; ', $postDown);
+        $server->save();
 
         return $this->wrapper->createServer($server);
     }
