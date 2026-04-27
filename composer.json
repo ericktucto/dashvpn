@@ -21,9 +21,9 @@
     ],
     "scripts": {
         "server": [
-            "echo http://localhost:8686",
+            "echo http://localhost:8980",
             "Composer\\Config::disableProcessTimeout",
-            "@php -S 0.0.0.0:8686 -t public"
+            "@php -S 0.0.0.0:8980 -t public"
         ],
         "test": "vendor/bin/phpunit --colors=always",
         "psalm": "vendor/bin/psalm --no-cache --show-info=true --error-level=1"
