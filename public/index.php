@@ -5,6 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use App\Api\AuthController;
 use App\Api\Middlewares\AuthMiddleware;
 use App\Api\Middlewares\PrivateMiddleware;
+use App\Api\SystemController;
 use App\Api\WireguardRoutes;
 use Touch\Application;
 use Touch\Core\Kernel;
@@ -30,6 +31,13 @@ $authMiddleware = $app->getContainer()->make(AuthMiddleware::class);
 
 $app->route()
     ->post("/api/change-password", [AuthController::class, 'changePassword'])
+    ->middleware($authMiddleware);
+
+$app->route()
+    ->get(
+        '/api/system/interfaces',
+        [SystemController::class, 'interfaces']
+    )
     ->middleware($authMiddleware);
 
 $app->route()

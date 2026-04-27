@@ -55,6 +55,9 @@ class WireguardWrapper implements PeerManageInterface
             $server->ip,
             $server->listenPort,
             $server->dns,
+            $server->getPostUpArray(),
+            $server->getPostDownArray(),
+            $server->interface,
         );
         $server->setKeys(
             $keys['publicKey'],
@@ -75,6 +78,9 @@ class WireguardWrapper implements PeerManageInterface
             $server->listenPort,
             new Ip($server->address),
             new Ip($server->dns),
+            $server->getPostUpArray(),
+            $server->getPostDownArray(),
+            $server->interface,
         );
     }
 
@@ -103,12 +109,11 @@ class WireguardWrapper implements PeerManageInterface
         $currentKey = 0;
         foreach ($peers as $key => $peer) {
             if (
-                $peer->getAddress() === $address->getValue() && $peer->getSlug() !== $slug
+                $peer->getAddress() === $address->getValue() && $peer->getSlug() !== $newSlug
             ) {
-                dd($peer, $slug);
                 throw new Exception('Ip already used');
             }
-            if ($peer->getSlug() === $slug) {
+            if ($peer->getSlug() === $newSlug) {
                 $target = $peer;
                 $currentKey = $key;
             }

@@ -27,6 +27,8 @@ final class ServerConfig implements ConfigInterface
         $lines[] = "Address = {$this->server->getAddress()}/24\n";
         $lines[] = "ListenPort = {$this->server->getListenPort()}\n";
         $lines[] = "PrivateKey = {$this->server->getPrivateKey()}\n";
+        $lines[] = "PostUp = {$this->server->getPostUpParsed()}\n";
+        $lines[] = "PostDown = {$this->server->getPostDownParsed()}\n";
         foreach ($this->peers as $peer) {
             $lines[] = "# {$peer->getName()}\n";
             $lines[] = "[Peer]\n";

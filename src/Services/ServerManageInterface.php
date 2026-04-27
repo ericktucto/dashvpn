@@ -7,11 +7,18 @@ use App\Domain\Wireguard\Server;
 
 interface ServerManageInterface
 {
+    /**
+     * @param list<string> $postUp
+     * @param list<string> $postDown
+     */
     public function createServer(
         Ip $ip,
         int $listenPort,
         Ip $address,
         Ip $dns,
+        array $postUp,
+        array $postDown,
+        string $interface
     ): Server;
 
 

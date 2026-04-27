@@ -39,12 +39,18 @@ final class ServerWGManage implements ServerManageInterface
         int $listenPort,
         Ip $address,
         Ip $dns,
+        array $postUp,
+        array $postDown,
+        string $interface,
     ): Server {
         $server = new Server(
             $address->getValue(),
             $ip->getValue(),
             $listenPort,
             $dns->getValue(),
+            $postUp,
+            $postDown,
+            $interface,
         );
 
         $keys = $this->generateKeys();

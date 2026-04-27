@@ -16,12 +16,16 @@ final class WireguardRoutes extends Route
     {
         $group->get('/server', [ServerController::class, 'index']);
         $group->post('/server', [ServerController::class, 'store']);
+        $group->get('/server/recommended', [ServerController::class, 'recommended']);
 
         $group->get('/peers/next-address', [PeerController::class, 'nextAllowAddress']);
+
+        // CRUD
         $group->get('/peers', [PeerController::class, 'index']);
         $group->post('/peers', [PeerController::class, 'store']);
         $group->put('/peers/{slug}', [PeerController::class, 'update']);
         $group->delete('/peers/{slug}', [PeerController::class, 'destroy']);
+
         $group->get('/peers/{slug}/share', [CreateController::class, 'index']);
         $group->get('/peers/{slug}/config', [PeerController::class, 'config']);
     }

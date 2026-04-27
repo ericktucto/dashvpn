@@ -2,6 +2,8 @@
 
 namespace App\Domain\Wireguard;
 
+use Illuminate\Support\Str;
+
 final class Server implements KeyAwareInterface, VPNAddressInterface
 {
     use KeyAwareTrait;
@@ -12,8 +14,56 @@ final class Server implements KeyAwareInterface, VPNAddressInterface
         protected string $ip,
         protected int $listenPort = 51820,
         protected string $dns = '',
+        /** @var list<string> */
+        protected array $postUp = [],
+        /** @var list<string> */
+        protected array $postDown = [],
+        protected string $interface = '',
     ) {
         $this->setKeys('', '');
+    }
+
+    public function getPostDownParsed(): string
+    {
+        $result = [];
+        foreach ($this->postUp as $line) {
+            if (Str::startsWith($line, '#')) {
+                continue;
+            }
+            $trimmed = trim($line);
+            if ($trimmed === '') {
+                continue;
+            }
+            $result[] = strtr($trimmed, [
+                '%interface%' => $this->getInterface(),
+                '%address%' => $this->getAddress(),
+            ]);
+        }
+        return join('; ', $result);
+    }
+
+    public function getPostUpParsed(): string
+    {
+        $result = [];
+        foreach ($this->postUp as $line) {
+            if (Str::startsWith($line, '#')) {
+                continue;
+            }
+            $trimmed = trim($line);
+            if ($trimmed === '') {
+                continue;
+            }
+            $result[] = strtr($trimmed, [
+                '%interface%' => $this->getInterface(),
+                '%address%' => $this->getAddress(),
+            ]);
+        }
+        return join('; ', $result);
+    }
+
+    public function getInterface(): string
+    {
+        return $this->interface;
     }
 
     public function getIp(): string

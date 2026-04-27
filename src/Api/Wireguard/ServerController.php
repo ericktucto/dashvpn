@@ -3,6 +3,7 @@
 namespace App\Api\Wireguard;
 
 use App\Domain\Wireguard\Ip;
+use App\Services\SystemService;
 use App\Services\WireguardService;
 use Psr\Http\Message\ResponseInterface;
 use Touch\Http\Request;
@@ -15,6 +16,7 @@ final class ServerController
      */
     public function __construct(
         protected WireguardService $service,
+        protected SystemService $system,
     ) {
     }
 
@@ -48,7 +50,59 @@ final class ServerController
                 (int) $json->listen_port,
                 new Ip($json->address),
                 new Ip($json->dns),
+                $json->post_up,
+                $json->post_down,
+                $json->interface,
             )->toArray(),
         ]);
+    }
+
+    public function recommended(): ResponseInterface
+    {
+        return Response::json([
+            'data' => [
+                'listen_port' => 51820,
+                'address' => '10.20.0.1',
+                'dns' => '1.1.1.1',
+                'post_up' => [
+                    "iptables -t nat -A POSTROUTING -s %address%/24 -o %interface% -j MASQUERADE",
+                    "iptables -A FORWARD -i wg0 -o %interface% -j ACCEPT",
+                    "iptables -A FORWARD -i %interface% -o wg0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT",
+                ],
+                'post_down' => [
+                    "iptables -t nat -D POSTROUTING -s %address%/24 -o %interface% -j MASQUERADE",
+                    "iptables -D FORWARD -i wg0 -o %interface% -j ACCEPT",
+                    "iptables -D FORWARD -i %interface% -o wg0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT",
+                ],
+                'interface' => $this->getInterfaceDefault(),
+            ],
+        ]);
+    }
+
+    protected function getInterfaceDefault(): string
+    {
+        $interfaces = $this->system->interfaces();
+        if ($interfaces === []) {
+            return '';
+        }
+
+        $first = '';
+        foreach ($interfaces as $name => $interface) {
+            if (preg_match('/^(eth|en|wlan|wl)/', $name)) {
+                if ($first === '') {
+                    $first = $name;
+                }
+                foreach ($interface['unicast'] as $addr) {
+                    if (
+                        $addr['family'] === 2 &&
+                        isset($addr['address']) &&
+                        $addr['address'] !== '127.0.0.1'
+                    ) {
+                        return $name;
+                    }
+                }
+            }
+        }
+        return $first;
     }
 }
