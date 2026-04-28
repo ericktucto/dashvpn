@@ -17,13 +17,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Active Corepack
-        run: |
-          corepack enable
-          pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: npm install
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
       - name: Set timestamp
         run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
