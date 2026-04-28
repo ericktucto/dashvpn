@@ -20,6 +20,7 @@ final class ServerWGManage implements ServerManageInterface
         protected ContainerInterface $container,
     ) {
         $this->prefix = $this->getConfigData('data.config_dir');
+        $this->script = $this->getConfigData('data.script');
     }
 
     protected function getConfigData(string $key): string
@@ -79,7 +80,7 @@ final class ServerWGManage implements ServerManageInterface
      */
     public function generateKeys(): array|false
     {
-        exec("sudo /usr/local/bin/wg-manager generate-keys '{$this->prefix}'");
+        exec("sudo {$this->script} generate-keys '{$this->prefix}'");
 
         return $this->getServerKeys();
     }
@@ -101,7 +102,7 @@ final class ServerWGManage implements ServerManageInterface
         ];
 
         $output = [];
-        exec("sudo /usr/local/bin/wg-manager get-keys '{$this->prefix}'", $output);
+        exec("sudo {$this->script} get-keys '{$this->prefix}'", $output);
         foreach ($output as $line) {
             [$key, $value] = explode('=', $line, 2);
             $keys[$key] = trim($value);
@@ -121,6 +122,6 @@ final class ServerWGManage implements ServerManageInterface
 
         file_put_contents("{$this->prefix}/wg0.conf", $lines);
 
-        exec("sudo /usr/local/bin/wg-manager reload '{$this->prefix}'");
+        exec("sudo {$this->script} reload '{$this->prefix}'");
     }
 }

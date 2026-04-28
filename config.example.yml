@@ -19,6 +19,7 @@ jwt:
   key: example
   expires: 3600
 data:
+  script: /usr/local/bin/wg-manager
   config_dir: '/home/ubuntu/.config/wireguard'
   ip: 127.0.0.1
   dns: 1.1.1.1
