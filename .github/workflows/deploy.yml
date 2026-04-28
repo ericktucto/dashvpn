@@ -4,6 +4,10 @@ on:
   push:
     branches: [deploy]
 
+defaults:
+  run:
+    working-directory: ./frontend
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
