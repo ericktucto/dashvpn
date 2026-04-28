@@ -19,13 +19,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Install dependencies
         run: npm install
 
       - name: Build
         run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.API_URL }}
 
       - name: Set timestamp
         run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
@@ -39,7 +41,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "dist-${{ env.TIMESTAMP }}.xz"
+          source: " frontend/dist-${{ env.TIMESTAMP }}.xz"
           target: "/tmp"
 
       - name: Execute remote commands
