@@ -7,7 +7,7 @@ createApp({
             const fileURL = URL.createObjectURL(file)
             const a = document.createElement("a")
             a.href = fileURL
-            a.download = "sharedlink.txt"
+            a.download = `${window.sharedlink.slug}.conf`
             a.click()
         },
     },

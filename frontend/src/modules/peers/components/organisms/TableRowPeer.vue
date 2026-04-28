@@ -4,7 +4,6 @@ import type { Peer } from '../../services/fetch';
 import DownloadPeerConf from '../../molecules/DownloadPeerConf.vue';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { BanIcon, EditIcon, SaveIcon } from 'lucide-vue-next';
 import QRShow from './QRShow.vue';
@@ -12,6 +11,7 @@ import ConfirmDelete from './ConfirmDelete.vue';
 import ShareLink from './ShareLink.vue';
 import { handleUpdate } from '../../composables/useUpdatePeer';
 import { useCrudStore } from '../../stores/crud';
+import AllowedIpButton from './AllowedIpButton.vue';
 
 const crudStore = useCrudStore()
 
@@ -26,9 +26,14 @@ const disabled = computed(() => {
     return false
 })
 
-const form = reactive({
+const form = reactive<{
+    name: string,
+    address: string,
+    allowedIps: string[],
+}>({
     name: '',
     address: '',
+    allowedIps: [],
 })
 
 const props = defineProps<{
@@ -43,6 +48,7 @@ function handleEdit(peer: Peer) {
     crudStore.addProcess('updating', peer.slug)
     form.name = peer.name
     form.address = peer.address
+    form.allowedIps = peer.allowed_ips
 }
 async function onUpdatePeer(peer: Peer) {
     const res = await handleUpdate(peer, form)
@@ -63,7 +69,12 @@ async function onUpdatePeer(peer: Peer) {
             <Input v-show="editing" v-model.trim="form.address" />
         </TableCell>
         <TableCell>
-            <Switch :modelValue="true" />
+            <span v-show="!editing">
+                <AllowedIpButton :allowed="peer.allowed_ips" readOnly />
+            </span>
+            <span v-show="editing">
+                <AllowedIpButton v-model:allowed="form.allowedIps" />
+            </span>
         </TableCell>
         <TableCell class="text-right pr-8">
             <div :class="[editing ? 'flex' : 'hidden']" class="justify-end gap-6">

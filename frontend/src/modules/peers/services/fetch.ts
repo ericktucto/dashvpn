@@ -10,6 +10,7 @@ export interface Peer {
     address: string;
     publicKey: string;
     slug: string;
+    allowed_ips: string[];
 }
 
 export type ResponseGetPeers = Peer[]
@@ -27,18 +28,20 @@ export function deletePeer(slug: string) {
 }
 export type PostPeer = {
     name: string
+    allowedIps: string[]
 }
 
 export type PutPeer = {
     name: string
     address: string
+    allowedIps: string[]
 }
-export function postPeer(name: string) {
+export function postPeer(name: string, allowedIps: string[]) {
     return axios.post<
         Peer,
         AxiosResponse<{ data: Peer }>,
         PostPeer
-    >('/api/wireguard/peers', { name })
+    >('/api/wireguard/peers', { name, allowedIps })
 }
 
 export function putPeer(slug: string, data: PutPeer) {

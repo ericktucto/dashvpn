@@ -12,11 +12,26 @@ final class Peer implements KeyAwareInterface, VPNAddressInterface
     public function __construct(
         protected string $name,
         protected string $address,
+        /** @var list<string> */
+        protected array $allowedIps = [],
         protected string $publicKey,
         protected string $privateKey,
         protected string $preSharedKey = '',
     ) {
         $this->setKeys($publicKey, $privateKey, $preSharedKey);
+    }
+
+    public function getAllowedIpsParsed(): string
+    {
+        $result = [];
+        foreach ($this->allowedIps as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '') {
+                continue;
+            }
+            $result[] = $trimmed;
+        }
+        return join(', ', $result);
     }
 
     public function getName(): string
@@ -39,6 +54,7 @@ final class Peer implements KeyAwareInterface, VPNAddressInterface
             'address' => $this->address,
             'publicKey' => $this->publicKey,
             'slug' => $this->getSlug(),
+            'allowed_ips' => $this->allowedIps,
         ];
     }
 }

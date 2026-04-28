@@ -23,7 +23,6 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 
 const peers = ref<Peer[]>([])
-const showRowSave = ref(false)
 
 const bootting = ref(false)
 async function boot() {
@@ -82,7 +81,7 @@ function handleSave(peer: Peer) {
                             NOMBRE DEL PEER
                         </TableHead>
                         <TableHead>IP ADDRESS</TableHead>
-                        <TableHead>ACTIVO</TableHead>
+                        <TableHead>IP Permitidas</TableHead>
                         <TableHead class="text-right pr-8 w-[300px]">
                             ACCIONES
                         </TableHead>
@@ -93,7 +92,7 @@ function handleSave(peer: Peer) {
                         @delete="handleDelete(peer, index)" @updated="handleUpdate($event, index)" />
                 </TableBody>
                 <TableFooter>
-                    <RowSave @cancel="showRowSave = false" @save="handleSave" />
+                    <RowSave @save="handleSave" />
                 </TableFooter>
             </Table>
         </div>

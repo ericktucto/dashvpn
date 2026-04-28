@@ -62,6 +62,7 @@ final class PeerController
         return Response::json([
             'data' => $this->service->createPeer(
                 $json->name,
+                $json->allowedIps,
             )->toArray(),
         ]);
     }
@@ -81,6 +82,7 @@ final class PeerController
                 $args['slug'],
                 $json->name,
                 new Ip($json->address),
+                $json->allowedIps,
             );
 
             return Response::json([

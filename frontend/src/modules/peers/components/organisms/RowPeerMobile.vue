@@ -8,11 +8,11 @@ import QRShow from './QRShow.vue';
 import ConfirmDelete from './ConfirmDelete.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import ShareLink from './ShareLink.vue';
 import DownloadPeerConf from '../../molecules/DownloadPeerConf.vue';
 import { handleUpdate } from '../../composables/useUpdatePeer';
 import { useCrudStore } from '../../stores/crud';
+import AllowedIpButton from './AllowedIpButton.vue';
 
 const crudStore = useCrudStore()
 
@@ -33,15 +33,21 @@ const disabled = computed(() => {
     return false
 })
 
-const form = reactive({
+const form = reactive<{
+    name: string,
+    address: string,
+    allowedIps: string[],
+}>({
     name: '',
     address: '',
+    allowedIps: [],
 })
 
 function handleEdit(peer: Peer) {
     crudStore.addProcess('updating', peer.slug)
     form.name = peer.name
     form.address = peer.address
+    form.allowedIps = peer.allowed_ips
 }
 async function onUpdatePeer(peer: Peer) {
     const res = await handleUpdate(peer, form)
@@ -57,7 +63,12 @@ async function onUpdatePeer(peer: Peer) {
             <CardTitle>{{ peer.name }}</CardTitle>
             <CardDescription>{{ peer.address }}</CardDescription>
             <CardAction>
-                <Switch :modelValue="true" />
+                <span v-show="!editing">
+                    <AllowedIpButton :allowed="peer.allowed_ips" readOnly />
+                </span>
+                <span v-show="editing">
+                    <AllowedIpButton v-model:allowed="form.allowedIps" />
+                </span>
             </CardAction>
         </CardHeader>
         <CardContent :class="[editing ? 'grid' : 'hidden']" class="space-y-4">
