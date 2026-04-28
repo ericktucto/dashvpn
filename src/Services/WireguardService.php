@@ -62,11 +62,16 @@ final class WireguardService
         return $this->wrapper->createServer($server);
     }
 
+    /**
+     * @param list<string> $allowedIps
+     */
     public function createPeer(
         string $name,
+        array $allowedIps = [],
     ): Peer {
         $peer = $this->wrapper->createPeer(
             $name,
+            $allowedIps,
         );
 
         if (!$peer) {
@@ -76,11 +81,15 @@ final class WireguardService
         return $peer;
     }
 
+    /**
+     * @param list<string> $allowedIps
+     */
     public function updatePeer(
         string $searchBySlug,
         string $name,
         Ip $address,
+        array $allowedIps = [],
     ): Peer {
-        return $this->wrapper->updatePeer($searchBySlug, $name, $address);
+        return $this->wrapper->updatePeer($searchBySlug, $name, $address, $allowedIps);
     }
 }

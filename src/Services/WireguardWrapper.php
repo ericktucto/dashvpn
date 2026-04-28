@@ -89,10 +89,14 @@ class WireguardWrapper implements PeerManageInterface
         return file_get_contents("{$this->prefix}/peers/{$slug}.conf");
     }
 
+    /**
+     * @param list<string> $allowedIps
+     */
     public function updatePeer(
         string $searchBySlug,
         string $name,
         Ip $address,
+        array $allowedIps = [],
     ): Peer {
         $newSlug = Str::slug($name);
 
@@ -131,6 +135,7 @@ class WireguardWrapper implements PeerManageInterface
         $peer = new Peer(
             $name,
             $address->getValue(),
+            $allowedIps,
             $target->getPublicKey(),
             $target->getPrivateKey(),
             $target->getPresharedKey(),
@@ -176,7 +181,13 @@ class WireguardWrapper implements PeerManageInterface
         $this->manager->reloadFileConfig($server, $peers);
     }
 
-    public function createPeer(string $name): ?Peer
+    /**
+     * @param list<string> $allowedIps
+     */
+    public function createPeer(
+        string $name,
+        array $allowedIps = [],
+    ): ?Peer
     {
         $this->generatePeersDirectory();
 
@@ -194,6 +205,7 @@ class WireguardWrapper implements PeerManageInterface
         $peer = new Peer(
             $name,
             $this->nextAllowAddress()->getValue(),
+            $allowedIps,
             $keys['publicKey'],
             $keys['privateKey'],
             $keys['presharedKey'],

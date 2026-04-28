@@ -32,7 +32,7 @@ final class PeerConfig implements ConfigInterface
         $lines[] = "PublicKey = {$this->server->getPublicKey()}\n";
         $lines[] = "PresharedKey = {$this->peer->getPresharedKey()}\n";
         $lines[] = "Endpoint = {$this->server->getIp()}:{$this->server->getListenPort()}\n";
-        $lines[] = "AllowedIPs = 0.0.0.0/0, ::/0\n";
+        $lines[] = "AllowedIPs = {$this->peer->getAllowedIpsParsed()}\n";
         $lines[] = "PersistentKeepalive = 25\n";
         return $lines;
     }

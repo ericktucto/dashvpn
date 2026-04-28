@@ -7,6 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogDescription,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ref } from 'vue';
@@ -15,9 +16,11 @@ import { PlusIcon } from 'lucide-vue-next';
 import { Label } from '@/components/ui/label';
 import { isAxiosError } from 'axios';
 import { toast } from 'vue-sonner';
+import AllowedIpButton from './AllowedIpButton.vue';
 
 const name = ref('')
 const nextIp = ref('')
+const allowedIps = ref<string[]>([])
 
 const emit = defineEmits<{
     cancel: []
@@ -25,12 +28,14 @@ const emit = defineEmits<{
 }>()
 
 function handleOpen() {
+    name.value = ''
+    allowedIps.value = ['0.0.0.0/0', '::/0']
     getNextAddress().then((res) => {
         nextIp.value = res.data.data.address
     })
 }
-function handleSave(name: string, close: () => void) {
-    postPeer(name).then(res => {
+function handleSave(name: string, allowedIps: string[], close: () => void) {
+    postPeer(name, allowedIps).then(res => {
         emit('save', res.data.data)
         close()
     }).catch(error => {
@@ -53,19 +58,22 @@ function handleSave(name: string, close: () => void) {
             <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Nuevo Peer</DialogTitle>
+                    <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <div class="grid gap-4">
                     <Label>Nombre</Label>
                     <Input v-model="name" placeholder="Escribe el nombre del peer" />
                     <Label>Interface Address</Label>
                     <Input v-model="nextIp" readonly />
+                    <Label>Ips permitidas</Label>
+                    <AllowedIpButton v-model:allowed="allowedIps" />
                 </div>
                 <DialogFooter>
                     <div class="flex justify-between w-full mt-4">
                         <Button variant="outline" @click="close()">
                             Cancel
                         </Button>
-                        <Button variant="destructive" :disabled="!name" @click="handleSave(name, close)">
+                        <Button :disabled="!name" @click="handleSave(name, allowedIps, close)">
                             Guardar
                         </Button>
                     </div>
