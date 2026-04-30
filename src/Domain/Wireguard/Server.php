@@ -26,7 +26,7 @@ final class Server implements KeyAwareInterface, VPNAddressInterface
     public function getPostDownParsed(): string
     {
         $result = [];
-        foreach ($this->postUp as $line) {
+        foreach ($this->postDown as $line) {
             if (Str::startsWith($line, '#')) {
                 continue;
             }

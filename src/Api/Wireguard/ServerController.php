@@ -66,13 +66,13 @@ final class ServerController
                 'dns' => '1.1.1.1',
                 'post_up' => [
                     "iptables -t nat -A POSTROUTING -s %net%/24 -o %interface% -j MASQUERADE",
-                    "iptables -A FORWARD -i wg0 -j ACCEPT",
-                    "iptables -A FORWARD -o wg0 -j ACCEPT",
+                    "iptables -A FORWARD -i wg0 -o %interface% -j ACCEPT",
+                    "iptables -A FORWARD -i %interface% -o wg0 -m state --state RELATED,ESTABLISHED -j ACCEPT",
                 ],
                 'post_down' => [
-                    "iptables -t nat -D POSTROUTING -s %net%/24 -o %interface% -j MASQUERADE",
-                    "iptables -D FORWARD -i wg0 -j ACCEPT",
-                    "iptables -D FORWARD -o wg0 -j ACCEPT",
+                    "iptables -t nat -A POSTROUTING -s %net%/24 -o %interface% -j MASQUERADE",
+                    "iptables -D FORWARD -i wg0 -o %interface% -j ACCEPT",
+                    "iptables -D FORWARD -i %interface% -o wg0 -m state --state RELATED,ESTABLISHED -j ACCEPT",
                 ],
                 'interface' => $this->getInterfaceDefault(),
             ],

@@ -3,5 +3,7 @@
 - [ ] Permitir desactivar peers
 - [ ] Colocar la definicion del servidor en base de datos, dejando la creacion el archivo como abstracto
 - [ ] Alerta, cuando se actualiza el servidor, es no existen peers
+- [ ] Agregar boton de reiniciar llaves, tanto peer como para el servidor
+- [ ] Advertir que el peer debe compartirse su configuracion si: regenera las llaves del servidor, se cambia el dns, se cambia al interface address, regenera la llave del peer
 - [x] Guardar los peers en una carpeta peers, tomar todos los peers y pasarlos a la configuración del archivo wg0.conf y luego cargar el archivo wg0.conf
 - [x] Crear backend para compartir peer por 15 minutos
